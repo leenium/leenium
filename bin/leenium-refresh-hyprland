@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Overwrite all the user configs in ~/.config/hypr with the Leenium defaults.
+
+leenium-refresh-config hypr/autostart.conf
+leenium-refresh-config hypr/bindings.conf
+leenium-refresh-config hypr/input.conf
+leenium-refresh-config hypr/looknfeel.conf
+leenium-refresh-config hypr/hyprland.conf

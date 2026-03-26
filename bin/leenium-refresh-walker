@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Overwrite the user configs for the Walker application launcher (which also powers the Leenium Menu) and restart the services.
+
+# Ensure walker is set to autostart
+mkdir -p ~/.config/autostart/
+cp $LEENIUM_PATH/default/walker/walker.desktop ~/.config/autostart/
+
+# And restarts if it crashes or is killed
+mkdir -p ~/.config/systemd/user/app-walker@autostart.service.d/
+cp $LEENIUM_PATH/default/walker/restart.conf ~/.config/systemd/user/app-walker@autostart.service.d/restart.conf
+
+systemctl --user daemon-reload
+
+# Refresh configs
+leenium-refresh-config walker/config.toml
+leenium-refresh-config elephant/calc.toml
+leenium-refresh-config elephant/desktopapplications.toml
+
+# Restart service
+leenium-restart-walker
