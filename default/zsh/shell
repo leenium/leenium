@@ -1,0 +1,15 @@
+# History control
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=16768
+SAVEHIST=$HISTSIZE
+HISTDUP=erase
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_SPACE
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_FIND_NO_DUPS
+
+# Ensure command hashing is off for mise
+unsetopt HASH_CMDS
