@@ -1,0 +1,77 @@
+name: Release On Version Tag
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare Release Notes
+        id: notes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="$GITHUB_REF_NAME"
+          commit="$tag^{}"
+          subject="$(git log -1 --format=%s "$commit")"
+          message="$(git log -1 --format=%B "$commit")"
+          previous_tag=""
+
+          if git rev-parse "${commit}^" >/dev/null 2>&1; then
+            previous_tag="$(git describe --tags --abbrev=0 "${commit}^" 2>/dev/null || true)"
+          fi
+
+          if [[ -n $previous_tag ]]; then
+            commit_range="${previous_tag}..${tag}"
+            range_label="${previous_tag} -> ${tag}"
+            intro_line="Changes since ${previous_tag}"
+          else
+            commit_range="$tag"
+            range_label="Project start -> ${tag}"
+            intro_line="Changes included in the first tagged release"
+          fi
+
+          release_title="${subject}"
+          release_file="$(mktemp)"
+
+          {
+            printf '## 🚀 %s\n\n' "$subject"
+            printf '%s\n\n' "$message"
+            printf '### ✨ %s\n\n' "$intro_line"
+
+            if git log --format='- %s (%h)' "$commit_range" | grep -q '.'; then
+              git log --format='- %s (%h)' "$commit_range"
+            else
+              printf -- '- No commits found in this range.\n'
+            fi
+
+            printf '\n### 🧭 Range\n\n'
+            printf -- '- `%s`\n' "$range_label"
+            printf -- '- Tagged commit: `%s`\n' "$(git rev-parse --short "$commit")"
+          } > "$release_file"
+
+          {
+            printf 'title<<EOF\n%s\nEOF\n' "$release_title"
+            printf 'body_path<<EOF\n%s\nEOF\n' "$release_file"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.notes.outputs.title }}
+          body_path: ${{ steps.notes.outputs.body_path }}
+          tag_name: ${{ github.ref_name }}

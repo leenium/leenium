@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+# Restore the bundled default Neovim config.
+
+REPO_SOURCE_DIR="$LEENIUM_PATH/default/nvim"
+TARGET_DIR="$HOME/.config/nvim"
+BACKUP_DIR="$HOME/.config/nvim.bak.$(date +%s)"
+
+if [[ -d $REPO_SOURCE_DIR ]] && find "$REPO_SOURCE_DIR" -mindepth 1 -print -quit | grep -q .; then
+  SOURCE_DIR="$REPO_SOURCE_DIR"
+else
+  echo "No packaged or bundled Neovim config found" >&2
+  exit 1
+fi
+
+if [[ -d $SOURCE_DIR ]]; then
+  mkdir -p "$HOME/.config"
+
+  if [[ -e $TARGET_DIR ]]; then
+    mv "$TARGET_DIR" "$BACKUP_DIR"
+    echo "Backed up existing Neovim config to $BACKUP_DIR"
+  fi
+
+  rm -rf "$TARGET_DIR"
+  cp -R "$SOURCE_DIR" "$TARGET_DIR"
+fi
