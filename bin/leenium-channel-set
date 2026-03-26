@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Reset Leenium to the stable branch and stable package repository.
+
+channel="${1:-stable}"
+
+if [[ $channel != "stable" ]]; then
+  echo "Unknown channel: $channel"
+  echo "Leenium now supports only the stable channel."
+  exit 1
+fi
+
+leenium-branch-set "master" && leenium-refresh-pacman
+
+leenium-update -y

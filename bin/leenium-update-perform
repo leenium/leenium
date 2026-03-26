@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+# Ensure screensaver/sleep doesn't set in during updates
+hyprctl dispatch tagwindow +noidle &>/dev/null || true
+
+# Capture update logs (CLICOLOR_FORCE keeps gum styled when stdout is piped through tee)
+export CLICOLOR_FORCE=1
+exec > >(tee "/tmp/leenium-update.log") 2>&1
+
+# Perform all update steps
+leenium-update-keyring
+leenium-update-available-reset
+leenium-update-system-pkgs
+leenium-migrate
+leenium-update-aur-pkgs
+leenium-update-orphan-pkgs
+leenium-hook post-update
+
+leenium-update-analyze-logs
+
+leenium-update-restart
+
+# Re-enable screensaver/sleep after updates
+hyprctl dispatch tagwindow -- -noidle &>/dev/null || true

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+echo -e "\e[32mUpdate Leenium\e[0m"
+
+leenium-update-time
+
+git -C $LEENIUM_PATH pull --autostash
+git -C $LEENIUM_PATH --no-pager diff --check || git -C $LEENIUM_PATH reset --merge

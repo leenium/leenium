@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Overwrite the package configuration for /etc/pacman with the Leenium stable defaults, then update all packages.
+
+# Take backup of existing files
+sudo cp -f /etc/pacman.conf /etc/pacman.conf.bak
+sudo cp -f /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+
+echo "Refreshing pacman configuration to Leenium stable"
+echo
+
+sudo cp -f "$LEENIUM_PATH/default/pacman/pacman-stable.conf" /etc/pacman.conf
+sudo cp -f "$LEENIUM_PATH/default/pacman/mirrorlist-stable" /etc/pacman.d/mirrorlist
+
+# Reset all package DBs and then update
+sudo pacman -Syyuu --noconfirm

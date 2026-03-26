@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leenium Source Colors</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #060b0f;
+      --panel: #0b1319;
+      --line: #1d313d;
+      --line-strong: #376781;
+      --text: #d8f7ea;
+      --muted: #8cb7a9;
+      --accent: #35d6a0;
+      --accent-bright: #5cf0ad;
+      --warn: #ffd479;
+      --warn-bright: #ffe19a;
+      --error: #ff5f56;
+      --error-soft: #ff7a72;
+      --sea: #94f1cd;
+      --sea-bright: #b7f7de;
+      --muted-bright: #a7d3c2;
+      --boot-fill: #a9b1d6;
+      --boot-track: #292e42;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .shell {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .dot.error {
+      background: var(--error);
+    }
+
+    .dot.warn {
+      background: var(--warn);
+    }
+
+    .dot.accent {
+      background: var(--accent);
+    }
+
+    .content {
+      padding: 20px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero,
+    .reference,
+    .swatch {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+    }
+
+    .hero {
+      padding: 22px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 16px;
+      font-size: clamp(1.8rem, 4.2vw, 3.3rem);
+      line-height: 1.02;
+    }
+
+    .lede {
+      margin-top: 14px;
+      max-width: 72ch;
+      color: var(--muted-bright);
+      line-height: 1.65;
+    }
+
+    .reference-grid,
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+    }
+
+    .reference {
+      overflow: hidden;
+    }
+
+    .reference-head {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .reference-body {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .boot-track {
+      height: 12px;
+      border-radius: 999px;
+      background: var(--boot-track);
+      overflow: hidden;
+    }
+
+    .boot-fill {
+      width: 62%;
+      height: 100%;
+      background: var(--boot-fill);
+    }
+
+    .code {
+      color: var(--warn);
+    }
+
+    .line-strong {
+      color: var(--line-strong);
+    }
+
+    .sea {
+      color: var(--sea);
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .swatch-grid {
+      gap: 12px;
+    }
+
+    .swatch {
+      overflow: hidden;
+    }
+
+    .swatch-color {
+      min-height: 108px;
+      padding: 14px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .swatch-color.dark {
+      color: var(--bg);
+    }
+
+    .swatch-body {
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      border-top: 1px solid var(--line);
+    }
+
+    .token {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .hex {
+      font-size: 0.82rem;
+      opacity: 0.92;
+    }
+
+    .usage {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .note {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      color: var(--muted-bright);
+      line-height: 1.65;
+      background: var(--panel);
+    }
+
+    .note strong {
+      color: var(--text);
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 10px;
+      }
+
+      .content {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="shell">
+      <header class="topbar">
+        <div class="dots" aria-hidden="true">
+          <span class="dot error"></span>
+          <span class="dot warn"></span>
+          <span class="dot accent"></span>
+        </div>
+        <strong>Leenium Source Colors</strong>
+        <span>Exact values from Plymouth, Limine, and installer</span>
+      </header>
+
+      <div class="content">
+        <section class="hero">
+          <span class="eyebrow">No Derived Colors</span>
+          <h1>One palette, same accents, same source values.</h1>
+          <p class="lede">
+            This page only uses colors that already exist in
+            <code>default/plymouth/leenium.script</code>,
+            <code>default/limine/limine.conf</code>, and
+            <code>install/helpers/presentation.sh</code>. No extra shades were added.
+          </p>
+        </section>
+
+        <section class="reference-grid">
+          <article class="reference">
+            <div class="reference-head">Plymouth</div>
+            <div class="reference-body">
+              <div class="label">Background</div>
+              <div><span class="sea">#060B0F</span> from `Window.SetBackgroundTopColor(0.024, 0.043, 0.059)`</div>
+              <div class="label">Progress</div>
+              <div class="boot-track"><div class="boot-fill"></div></div>
+              <div><span class="sea">#292E42</span> track, <span class="sea">#A9B1D6</span> fill</div>
+            </div>
+          </article>
+
+          <article class="reference">
+            <div class="reference-head">Limine</div>
+            <div class="reference-body">
+              <div class="label">Core</div>
+              <div><span class="accent">#35D6A0</span> accent, <span class="sea">#D8F7EA</span> foreground, <span class="muted">#8CB7A9</span> muted</div>
+              <div class="label">Structure</div>
+              <div><span class="line-strong">#376781</span> strong line, <span class="muted">#1D313D</span> line, <span class="code">#FFD479</span> warn</div>
+            </div>
+          </article>
+
+          <article class="reference">
+            <div class="reference-head">Installer</div>
+            <div class="reference-body">
+              <div class="label">Shared Variables</div>
+              <div>`LEENIUM_COLOR_BG` <span class="sea">#060B0F</span></div>
+              <div>`LEENIUM_COLOR_PANEL` <span class="sea">#0B1319</span></div>
+              <div>`LEENIUM_COLOR_ACCENT` <span class="accent">#35D6A0</span></div>
+              <div>`LEENIUM_COLOR_WARN` <span class="code">#FFD479</span></div>
+              <div>`LEENIUM_COLOR_ERROR` <span style="color: var(--error);">#FF5F56</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section>
+          <h2>Palette</h2>
+          <div class="swatch-grid">
+            <article class="swatch">
+              <div class="swatch-color" style="background: #060b0f;">
+                <span class="token">Background</span>
+                <span class="hex">#060B0F</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Plymouth background, Limine background, installer background.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color" style="background: #0b1319;">
+                <span class="token">Panel</span>
+                <span class="hex">#0B1319</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine terminal palette slot 0 and installer panel.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color" style="background: #1d313d;">
+                <span class="token">Line</span>
+                <span class="hex">#1D313D</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Installer line and Limine bright dark tone.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color" style="background: #376781;">
+                <span class="token">Line Strong</span>
+                <span class="hex">#376781</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine palette blue for stronger borders and structure.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #d8f7ea;">
+                <span class="token">Text</span>
+                <span class="hex">#D8F7EA</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine foreground and installer text color.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #8cb7a9;">
+                <span class="token">Muted</span>
+                <span class="hex">#8CB7A9</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Installer muted color and Limine palette slot 5.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #35d6a0;">
+                <span class="token">Accent</span>
+                <span class="hex">#35D6A0</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Primary accent shared by Limine and installer.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #5cf0ad;">
+                <span class="token">Accent Bright</span>
+                <span class="hex">#5CF0AD</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine bright accent variant.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #94f1cd;">
+                <span class="token">Sea</span>
+                <span class="hex">#94F1CD</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine secondary highlight tone.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #a7d3c2;">
+                <span class="token">Muted Bright</span>
+                <span class="hex">#A7D3C2</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine bright muted tone.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #b7f7de;">
+                <span class="token">Sea Bright</span>
+                <span class="hex">#B7F7DE</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine bright secondary highlight.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #ffd479;">
+                <span class="token">Warn</span>
+                <span class="hex">#FFD479</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Shared warning accent in Limine and installer.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #ffe19a;">
+                <span class="token">Warn Bright</span>
+                <span class="hex">#FFE19A</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine bright warning tone.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #ff5f56;">
+                <span class="token">Error</span>
+                <span class="hex">#FF5F56</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Installer error color and Limine red slot.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #ff7a72;">
+                <span class="token">Error Soft</span>
+                <span class="hex">#FF7A72</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Limine bright error tone.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color dark" style="background: #a9b1d6;">
+                <span class="token">Boot Fill</span>
+                <span class="hex">#A9B1D6</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Plymouth progress bar fill.</div>
+              </div>
+            </article>
+
+            <article class="swatch">
+              <div class="swatch-color" style="background: #292e42;">
+                <span class="token">Boot Track</span>
+                <span class="hex">#292E42</span>
+              </div>
+              <div class="swatch-body">
+                <div class="usage">Plymouth progress bar track.</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="note">
+          <strong>Compared result:</strong> Limine and the installer already use the same main accent
+          `#35D6A0`, the same warning `#FFD479`, the same base background `#060B0F`, and the same
+          text family. Plymouth matches the same dark base and adds only its own progress colors
+          `#A9B1D6` and `#292E42`. This page now reflects those exact values only.
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

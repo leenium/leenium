@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+# Overwrite all user configs with the Leenium defaults.
+
+if (( EUID == 0 )); then
+  echo "Error: This script should not be run as root"
+  exit 1
+fi
+
+echo "Resetting all Leenium configs"
+cp -R ~/.local/share/leenium/config/* ~/.config/
+cp ~/.local/share/leenium/default/bashrc ~/.bashrc
+cp ~/.local/share/leenium/default/zshrc ~/.zshrc
+cp ~/.local/share/leenium/default/zprofile ~/.zprofile
+echo '[[ -f ~/.bashrc ]] && . ~/.bashrc' | tee ~/.bash_profile >/dev/null
+
+$(bash $LEENIUM_PATH/install/config/theme.sh)
+
+leenium-refresh-limine
+leenium-refresh-plymouth
+leenium-nvim-setup

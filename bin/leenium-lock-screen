@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Locks the system using hyprlock, and stops the screensaver first.
+
+# Lock the screen
+pidof hyprlock || hyprlock &
+
+# Set keyboard layout to default (first layout)
+hyprctl switchxkblayout all 0 > /dev/null 2>&1
+
+# Lock any active Bitwarden CLI session if present
+if command -v bw >/dev/null 2>&1; then
+  bw lock >/dev/null 2>&1 || true
+fi
+
+# Avoid running screensaver when locked
+pkill -f org.leenium.screensaver

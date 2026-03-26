@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Sync Leenium theme to VS Code, VSCodium, and Cursor
+
+VS_CODE_THEME="$HOME/.config/leenium/current/theme/vscode.json"
+
+set_theme() {
+  local editor_cmd="$1"
+  local settings_path="$2"
+  local skip_flag="$3"
+  local theme_name
+  local extension
+  local tmp_settings
+  local jq_filter
+
+  leenium-cmd-present "$editor_cmd" && [[ ! -f $skip_flag ]] || return 0
+
+  if [[ -f $VS_CODE_THEME ]]; then
+    theme_name=$(jq -r '.name' "$VS_CODE_THEME")
+    extension=$(jq -r '.extension' "$VS_CODE_THEME")
+
+    if [[ -n $extension ]] && ! "$editor_cmd" --list-extensions | grep -Fxq "$extension"; then
+      "$editor_cmd" --install-extension "$extension" >/dev/null
+    fi
+
+    mkdir -p "$(dirname "$settings_path")"
+    [[ -f $settings_path ]] || printf '{\n}\n' >"$settings_path"
+
+    tmp_settings=$(mktemp)
+    jq_filter='.
+      | .["workbench.colorTheme"] = $theme_name
+      | if $customizations == null then del(.["workbench.colorCustomizations"]) else .["workbench.colorCustomizations"] = $customizations end
+      | if $token_customizations == null then del(.["editor.tokenColorCustomizations"]) else .["editor.tokenColorCustomizations"] = $token_customizations end'
+
+    if ! jq \
+      --arg theme_name "$theme_name" \
+      --argjson customizations "$(jq -c '.colorCustomizations // null' "$VS_CODE_THEME")" \
+      --argjson token_customizations "$(jq -c '.tokenColorCustomizations // null' "$VS_CODE_THEME")" \
+      "$jq_filter" \
+      "$settings_path" >"$tmp_settings"; then
+      rm -f "$tmp_settings"
+      return 1
+    fi
+
+    mv "$tmp_settings" "$settings_path"
+  elif [[ -f $settings_path ]]; then
+    tmp_settings=$(mktemp)
+
+    if ! jq 'del(.["workbench.colorTheme"], .["workbench.colorCustomizations"], .["editor.tokenColorCustomizations"])' \
+      "$settings_path" >"$tmp_settings"; then
+      rm -f "$tmp_settings"
+      return 1
+    fi
+
+    mv "$tmp_settings" "$settings_path"
+  fi
+}
+
+set_theme "code" "$HOME/.config/Code/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-vscode-theme-changes"
+set_theme "code-insiders" "$HOME/.config/Code - Insiders/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-vscode-insiders-theme-changes"
+set_theme "codium" "$HOME/.config/VSCodium/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-codium-theme-changes"
+set_theme "cursor" "$HOME/.config/Cursor/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-cursor-theme-changes"

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+leenium-restart-app waybar

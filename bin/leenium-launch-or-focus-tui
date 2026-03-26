@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Launch or focus on a given TUI identified by the passed in as the command.
+# Use by commands like leenium-launch-wifi to ensure there is only one wifi configuration screen open.
+
+APP_ID="org.leenium.$(basename "$1")"
+LAUNCH_COMMAND="leenium-launch-tui $@"
+
+exec leenium-launch-or-focus "$APP_ID" "$LAUNCH_COMMAND"

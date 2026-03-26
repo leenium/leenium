@@ -1,0 +1,12 @@
+# Changes require a restart to take effect.
+
+# Ensure Leenium bins are in the path
+export LEENIUM_PATH=$HOME/.local/share/leenium
+export PATH=$LEENIUM_PATH/bin:$PATH:$HOME/.local/bin
+export SHELL=/usr/bin/zsh
+
+# Set default terminal and editor
+source ~/.config/uwsm/default
+
+# Activate mise if present on the system
+leenium-cmd-present mise && eval "$(mise activate bash --shims)"
