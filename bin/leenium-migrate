@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Run all pending migrations to bring the system in line with the installed version.
+# Leenium 1.0.0 is the baseline; only migrations created after that point should exist.
+
+shopt -s nullglob
+
+LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
+STATE_DIR="$HOME/.local/state/leenium/migrations"
+STATE_ROOT="$HOME/.local/state/leenium"
+VERSION_STATE_FILE="$STATE_ROOT/version"
+mkdir -p "$STATE_DIR"
+mkdir -p "$STATE_DIR/skipped"
+
+version_lt() {
+  [[ $1 != "$2" ]] && [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+}
+
+version_le() {
+  [[ $1 == "$2" ]] || [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+}
+
+current_version=$(<"$LEENIUM_PATH/version")
+
+if [[ -f $VERSION_STATE_FILE ]]; then
+  previous_version=$(<"$VERSION_STATE_FILE")
+else
+  previous_version="1.0.0"
+fi
+
+files=("$LEENIUM_PATH"/migrations/*.sh)
+
+if (( ${#files[@]} == 0 )); then
+  printf '%s\n' "$current_version" >"$VERSION_STATE_FILE"
+  echo "No migrations to run."
+  exit 0
+fi
+
+for file in "${files[@]}"; do
+  filename=$(basename "$file")
+  migration_version=$(sed -n 's/^MIGRATION_VERSION="\([^"]*\)"$/\1/p' "$file" | head -n1)
+
+  if [[ ! -f $STATE_DIR/$filename && ! -f $STATE_DIR/skipped/$filename ]]; then
+    if [[ -n $migration_version ]] && (! version_lt "$previous_version" "$migration_version" || ! version_le "$migration_version" "$current_version"); then
+      continue
+    fi
+
+    echo -e "\e[32m\nRunning migration (${filename%.sh})\e[0m"
+
+    if bash "$file"; then
+      touch "$STATE_DIR/$filename"
+    else
+      if gum confirm "Migration ${filename%.sh} failed. Skip and continue?"; then
+        touch "$STATE_DIR/skipped/$filename"
+      else
+        exit 1
+      fi
+    fi
+  fi
+done
+
+printf '%s\n' "$current_version" >"$VERSION_STATE_FILE"

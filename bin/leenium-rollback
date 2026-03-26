@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Show recent update history and launch snapshot rollback.
+
+LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
+ASSUME_YES=false
+SNAPSHOT_ID=""
+
+while (( $# > 0 )); do
+  case "$1" in
+    --yes)
+      ASSUME_YES=true
+      shift
+      ;;
+    --snapshot-id)
+      SNAPSHOT_ID="$2"
+      shift 2
+      ;;
+    -h|--help)
+      cat <<EOF
+Usage: leenium-rollback [--yes] [--snapshot-id <id>]
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+choose_snapshot() {
+  local rows=()
+  local selected
+
+  while IFS=$'\t' read -r number date description; do
+    [[ -n $number ]] || continue
+    rows+=("$number  $date  ${description:-"-"}")
+  done < <(sudo snapper --csvout --separator $'\t' --no-headers -c root list --columns number,date,description 2>/dev/null | tac)
+
+  if (( ${#rows[@]} == 0 )); then
+    echo "No root snapshots found." >&2
+    exit 1
+  fi
+
+  if [[ $ASSUME_YES == "true" ]]; then
+    selected="${rows[0]}"
+  else
+    selected=$(printf '%s\n' "${rows[@]}" | gum choose --header "Select root snapshot to roll back to") || exit 0
+  fi
+
+  echo "$selected" | awk '{print $1}'
+}
+
+if ! command -v snapper &>/dev/null; then
+  echo "Snapper is not installed, so rollback is not available." >&2
+  exit 1
+fi
+
+echo -e "\e[32mRecent Leenium update history\e[0m"
+leenium-update-history --limit 10
+echo
+
+if [[ -z $SNAPSHOT_ID ]]; then
+  SNAPSHOT_ID=$(choose_snapshot)
+fi
+
+if [[ ! $SNAPSHOT_ID =~ ^[0-9]+$ ]]; then
+  echo "Snapshot ID must be numeric" >&2
+  exit 1
+fi
+
+if [[ $ASSUME_YES == "true" ]] || gum confirm "Roll back to root snapshot #$SNAPSHOT_ID now?"; then
+  leenium-update-history-record \
+    --timestamp "$(date --iso-8601=seconds)" \
+    --action "rollback" \
+    --status "started" \
+    --snapshot "$SNAPSHOT_ID" \
+    --before-branch "$(leenium-version-branch 2>/dev/null || true)" \
+    --after-branch "$(leenium-version-branch 2>/dev/null || true)" \
+    --before-version "$(leenium-version 2>/dev/null || true)" \
+    --after-version "$(leenium-version 2>/dev/null || true)" \
+    --before-commit "$(git -C "$LEENIUM_PATH" rev-parse --short HEAD 2>/dev/null || true)" \
+    --after-commit "$(git -C "$LEENIUM_PATH" rev-parse --short HEAD 2>/dev/null || true)" \
+    --channel "$(leenium-version-channel 2>/dev/null || true)" \
+    --snapshot-ids "root:$SNAPSHOT_ID"
+
+  leenium-snapshot restore "$SNAPSHOT_ID"
+fi

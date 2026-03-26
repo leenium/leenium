@@ -1,0 +1,164 @@
+#!/bin/bash
+
+# Show recent Leenium update and rollback history.
+
+STATE_DIR="$HOME/.local/state/leenium"
+HISTORY_FILE="$STATE_DIR/update-history.tsv"
+LIMIT=15
+RAW=false
+JSON=false
+
+json_escape() {
+  local value="$1"
+
+  value=${value//\\/\\\\}
+  value=${value//\"/\\\"}
+  value=${value//$'\n'/\\n}
+  value=${value//$'\r'/\\r}
+  value=${value//$'\t'/\\t}
+
+  printf '%s' "$value"
+}
+
+print_json_entry() {
+  local first="$1"
+  local timestamp="$2"
+  local action="$3"
+  local status="$4"
+  local snapshot="$5"
+  local before_branch="$6"
+  local after_branch="$7"
+  local before_version="$8"
+  local after_version="$9"
+  local before_commit="${10}"
+  local after_commit="${11}"
+  local channel="${12}"
+  local snapshot_ids="${13}"
+
+  if [[ $first != "true" ]]; then
+    echo ","
+  fi
+
+  printf '  {"timestamp":"%s","action":"%s","status":"%s","snapshot":"%s","before_branch":"%s","after_branch":"%s","before_version":"%s","after_version":"%s","before_commit":"%s","after_commit":"%s","channel":"%s","snapshot_ids":"%s"}' \
+    "$(json_escape "$timestamp")" \
+    "$(json_escape "$action")" \
+    "$(json_escape "$status")" \
+    "$(json_escape "$snapshot")" \
+    "$(json_escape "$before_branch")" \
+    "$(json_escape "$after_branch")" \
+    "$(json_escape "$before_version")" \
+    "$(json_escape "$after_version")" \
+    "$(json_escape "$before_commit")" \
+    "$(json_escape "$after_commit")" \
+    "$(json_escape "$channel")" \
+    "$(json_escape "$snapshot_ids")"
+}
+
+while (( $# > 0 )); do
+  case "$1" in
+    --all)
+      LIMIT=0
+      shift
+      ;;
+    --limit)
+      LIMIT="$2"
+      shift 2
+      ;;
+    --raw)
+      RAW=true
+      shift
+      ;;
+    --json)
+      JSON=true
+      shift
+      ;;
+    -h|--help)
+      cat <<EOF
+Usage: leenium-update-history [--all] [--limit <count>] [--raw|--json]
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [[ ! -f $HISTORY_FILE ]]; then
+  if [[ $JSON == "true" ]]; then
+    echo "[]"
+  else
+    echo "No Leenium update history found."
+  fi
+  exit 0
+fi
+
+if [[ $RAW == "true" ]]; then
+  cat "$HISTORY_FILE"
+  exit 0
+fi
+
+mapfile -t entries < <(tac "$HISTORY_FILE")
+
+if (( LIMIT > 0 && ${#entries[@]} > LIMIT )); then
+  entries=("${entries[@]:0:LIMIT}")
+fi
+
+if [[ $JSON == "true" ]]; then
+  echo "["
+  first=true
+
+  for entry in "${entries[@]}"; do
+    IFS=$'\t' read -r timestamp action status snapshot before_branch after_branch before_version after_version before_commit after_commit channel snapshot_ids <<<"$entry"
+    print_json_entry "$first" "$timestamp" "$action" "$status" "$snapshot" "$before_branch" "$after_branch" "$before_version" "$after_version" "$before_commit" "$after_commit" "$channel" "$snapshot_ids"
+    first=false
+  done
+
+  echo
+  echo "]"
+  exit 0
+fi
+
+printf '%-20s %-12s %-10s %-12s %-10s %-10s %-9s\n' "Time" "Action" "Status" "Snapshot" "From" "To" "Channel"
+
+for entry in "${entries[@]}"; do
+  IFS=$'\t' read -r timestamp action status snapshot before_branch after_branch before_version after_version before_commit after_commit channel snapshot_ids <<<"$entry"
+
+  if [[ -z $after_branch ]]; then
+    after_branch="-"
+  fi
+
+  if [[ -z $before_branch ]]; then
+    before_branch="-"
+  fi
+
+  if [[ -z $snapshot ]]; then
+    snapshot="-"
+  fi
+
+  if [[ -z $channel ]]; then
+    channel="-"
+  fi
+
+  printf '%-20s %-12s %-10s %-12s %-10s %-10s %-9s\n' \
+    "$timestamp" \
+    "$action" \
+    "$status" \
+    "$snapshot" \
+    "$before_branch" \
+    "$after_branch" \
+    "$channel"
+
+  if [[ -n $before_version || -n $after_version || -n $before_commit || -n $after_commit ]]; then
+    printf '  versions: %s -> %s | commits: %s -> %s\n' \
+      "${before_version:-"-"}" \
+      "${after_version:-"-"}" \
+      "${before_commit:-"-"}" \
+      "${after_commit:-"-"}"
+  fi
+
+  if [[ -n $snapshot_ids ]]; then
+    printf '  snapshot IDs: %s\n' "$snapshot_ids"
+  fi
+done

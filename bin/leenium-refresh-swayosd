@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Overwrite the user configs for swayosd (controls on-screen feedback for changing volume/songs etc) with the Leenium defaults and restart the service.
+
+leenium-refresh-config swayosd/config.toml
+leenium-refresh-config swayosd/style.css
+leenium-restart-swayosd

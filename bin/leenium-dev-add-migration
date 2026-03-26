@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Creates a new Leenium migration named after the unix timestamp of the last commit.
+# Only intended for Leenium developers.
+
+cd ~/.local/share/leenium
+mkdir -p "$HOME/.local/share/leenium/migrations"
+migration_file="$HOME/.local/share/leenium/migrations/$(git log -1 --format=%cd --date=unix).sh"
+
+cat >"$migration_file" <<'EOF'
+echo "Describe what this migration does"
+MIGRATION_VERSION="1.0.1"
+
+# Use $LEENIUM_PATH to reference the leenium directory.
+EOF
+
+if [[ $1 != "--no-edit" ]]; then
+  nvim "$migration_file"
+fi
+
+echo "$migration_file"

@@ -1,0 +1,65 @@
+#!/bin/bash
+
+set -e
+LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
+
+record_branch_history() {
+  local status="$1"
+
+  leenium-update-history-record \
+    --timestamp "$started_at" \
+    --action "branch-switch" \
+    --status "$status" \
+    --snapshot "$snapshot_status" \
+    --before-branch "$before_branch" \
+    --after-branch "$(leenium-version-branch 2>/dev/null || true)" \
+    --before-version "$before_version" \
+    --after-version "$(leenium-version 2>/dev/null || true)" \
+    --before-commit "$before_commit" \
+    --after-commit "$(git -C "$LEENIUM_PATH" rev-parse --short HEAD 2>/dev/null || true)" \
+    --channel "$(leenium-version-channel 2>/dev/null || true)" \
+    --snapshot-ids "$snapshot_ids"
+}
+
+trap 'record_branch_history "failed"' ERR
+
+if (($# == 0)); then
+  echo "Usage: leenium-update-branch [master|dev]"
+  exit 1
+fi
+
+branch="$1"
+started_at=$(date --iso-8601=seconds)
+before_branch=$(leenium-version-branch 2>/dev/null || true)
+before_version=$(leenium-version 2>/dev/null || true)
+before_commit=$(git -C "$LEENIUM_PATH" rev-parse --short HEAD 2>/dev/null || true)
+snapshot_status="failed"
+snapshot_ids=""
+
+# Snapshot before switching branch
+if snapshot_ids=$(leenium-snapshot create --ids-only); then
+  snapshot_status="created"
+elif (( $? == 127 )); then
+  snapshot_status="unavailable"
+fi
+
+if ! git -C "$LEENIUM_PATH" diff --quiet || ! git -C "$LEENIUM_PATH" diff --cached --quiet; then
+  stashed=true
+  git -C "$LEENIUM_PATH" stash push -u -m "Autostash before switching to $branch"
+else
+  stashed=false
+fi
+
+# Switch branches
+git -C "$LEENIUM_PATH" switch "$branch"
+
+# Reapply stash if we made one
+if [[ $stashed == "true" ]]; then
+  if ! git -C "$LEENIUM_PATH" stash pop; then
+    echo "⚠️ Conflicts when applying stash — stash kept"
+  fi
+fi
+
+# Update the system from the new branch
+leenium-update-perform
+record_branch_history "success"

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -e
+
+COMMAND="$1"
+LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
+IDS_ONLY=false
+
+if [[ -z $COMMAND ]]; then
+  echo "Usage: leenium-snapshot <create|restore> [options]" >&2
+  exit 1
+fi
+
+if ! command -v snapper &>/dev/null; then
+  exit 127 # leenium-update can use this to just ignore if snapper is not available
+fi
+
+case "$COMMAND" in
+create)
+  shift
+
+  while (( $# > 0 )); do
+    case "$1" in
+      --ids-only)
+        IDS_ONLY=true
+        shift
+        ;;
+      *)
+        echo "Unknown option: $1" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  DESC="$(leenium-version)"
+  SNAPSHOT_IDS=()
+
+  if [[ $IDS_ONLY != "true" ]]; then
+    echo -e "\e[32mCreate system snapshot\e[0m"
+  fi
+
+  # Get existing snapper config names from CSV output
+  mapfile -t CONFIGS < <(sudo snapper --csvout list-configs | awk -F, 'NR>1 {print $1}')
+
+  for config in "${CONFIGS[@]}"; do
+    snapshot_id=$(sudo snapper -c "$config" create -c number -d "$DESC" -p)
+    SNAPSHOT_IDS+=("$config:$snapshot_id")
+
+    if [[ $IDS_ONLY != "true" ]]; then
+      echo "Created $config snapshot #$snapshot_id"
+    fi
+  done
+
+  if [[ $IDS_ONLY != "true" ]]; then
+    echo
+  fi
+
+  printf '%s\n' "${SNAPSHOT_IDS[*]}" | tr ' ' ','
+  ;;
+restore)
+  shift
+
+  if [[ -n $1 ]]; then
+    snapshot_id="$1"
+
+    if [[ ! $snapshot_id =~ ^[0-9]+$ ]]; then
+      echo "Snapshot ID must be numeric" >&2
+      exit 1
+    fi
+
+    sudo snapper -c root rollback "$snapshot_id"
+    sudo limine-snapper-restore --kernels "$snapshot_id"
+  else
+    sudo limine-snapper-restore
+  fi
+  ;;
+esac

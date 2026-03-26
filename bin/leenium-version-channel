@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if grep -q "https://pkgs.leenium.org/stable/" /etc/pacman.conf; then
+  echo "stable"
+else
+  echo "custom"
+fi

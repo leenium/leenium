@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Set the branch for Leenium's git repository.
+
+if (($# == 0)); then
+  echo "Usage: leenium-branch-set master"
+  exit 1
+else
+  branch="$1"
+fi
+
+if [[ $branch != "master" ]]; then
+  echo "Error: Invalid branch '$branch'. Only 'master' is supported."
+  exit 1
+fi
+
+git -C $LEENIUM_PATH switch $branch
