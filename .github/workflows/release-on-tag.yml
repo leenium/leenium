@@ -28,35 +28,54 @@ jobs:
           set -euo pipefail
 
           tag="$GITHUB_REF_NAME"
-          commit="$tag^{}"
-          subject="$(git log -1 --format=%s "$commit")"
-          message="$(git log -1 --format=%B "$commit")"
+          commit="$(git rev-list -n 1 "$tag")"
+          tag_subject="$(git for-each-ref --format='%(subject)' "refs/tags/$tag")"
+          tag_body="$(git for-each-ref --format='%(body)' "refs/tags/$tag")"
           previous_tag=""
+          first_release="false"
 
           if git rev-parse "${commit}^" >/dev/null 2>&1; then
             previous_tag="$(git describe --tags --abbrev=0 "${commit}^" 2>/dev/null || true)"
           fi
 
           if [[ -n $previous_tag ]]; then
-            commit_range="${previous_tag}..${tag}"
+            commit_range="${previous_tag}..${commit}"
             range_label="${previous_tag} -> ${tag}"
             intro_line="Changes since ${previous_tag}"
           else
-            commit_range="$tag"
+            commit_range="$commit"
             range_label="Project start -> ${tag}"
             intro_line="Changes included in the first tagged release"
+            first_release="true"
           fi
 
-          release_title="${subject}"
+          if [[ -n $tag_subject ]]; then
+            release_title="$tag_subject"
+          else
+            release_title="$(git log -1 --format=%s "$commit")"
+          fi
+
+          if [[ -n $tag_body ]]; then
+            release_intro="$tag_body"
+          else
+            release_intro="$(git log -1 --format=%B "$commit")"
+          fi
+
           release_file="$(mktemp)"
 
           {
-            printf '## 🚀 %s\n\n' "$subject"
-            printf '%s\n\n' "$message"
+            printf '## 🚀 %s\n\n' "$release_title"
+            printf '%s\n\n' "$release_intro"
             printf '### ✨ %s\n\n' "$intro_line"
 
-            if git log --format='- %s (%h)' "$commit_range" | grep -q '.'; then
-              git log --format='- %s (%h)' "$commit_range"
+            if [[ $first_release == "true" ]]; then
+              changelog="$(git log --reverse --format='- %s (%h)' "$commit_range")"
+            else
+              changelog="$(git log --format='- %s (%h)' "$commit_range")"
+            fi
+
+            if [[ -n $changelog ]]; then
+              printf '%s\n' "$changelog"
             else
               printf -- '- No commits found in this range.\n'
             fi
