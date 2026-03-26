@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Launch a floating terminal with the Leenium logo presentation, then execute the command passed in, and finally end with the leenium-show-done presentation.
+# Used by actions such as Update System.
+
+cmd="$*"
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.leenium.terminal --title=Leenium -e zsh -lc "leenium-show-logo; $cmd; if (( \$? != 130 )); then leenium-show-done; fi"
