@@ -1,0 +1,591 @@
+#!/bin/bash
+
+LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
+export PATH="$LEENIUM_PATH/bin:$PATH"
+
+STATE_DIR="$HOME/.local/state/leenium"
+MIGRATIONS_STATE_DIR="$STATE_DIR/migrations"
+USER_CONFIG_DIR="$HOME/.config"
+USER_LEENIUM_DIR="$USER_CONFIG_DIR/leenium"
+
+PASS_COUNT=0
+WARN_COUNT=0
+FAIL_COUNT=0
+
+print_usage() {
+  cat <<EOF
+Usage: leenium-doctor
+
+Checks the local Leenium installation for common configuration, theme, migration,
+and service problems.
+EOF
+}
+
+if (( $# > 0 )); then
+  case "$1" in
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo
+      print_usage
+      exit 1
+      ;;
+  esac
+fi
+
+pass() {
+  echo -e "\e[32mPASS\e[0m $1"
+  ((PASS_COUNT++))
+}
+
+warn() {
+  echo -e "\e[33mWARN\e[0m $1"
+  ((WARN_COUNT++))
+}
+
+fail() {
+  echo -e "\e[31mFAIL\e[0m $1"
+  ((FAIL_COUNT++))
+}
+
+section() {
+  echo
+  echo -e "\e[1m$1\e[0m"
+}
+
+desktop_exec_binary() {
+  local desktop_file="$1"
+  local exec_line
+  local exec_command
+  local exec_binary
+
+  exec_line=$(sed -n 's/^Exec=//p' "$desktop_file" 2>/dev/null | head -1)
+  [[ -n $exec_line ]] || return 1
+
+  exec_command=${exec_line%% *}
+  exec_command=${exec_command%%\%*}
+  exec_binary=$(basename "$exec_command")
+
+  [[ -n $exec_binary ]] || return 1
+  echo "$exec_binary"
+}
+
+desktop_exec_line() {
+  local desktop_file="$1"
+
+  sed -n 's/^Exec=//p' "$desktop_file" 2>/dev/null | head -1
+}
+
+check_desktop_entry() {
+  local desktop_file="$1"
+  local label="$2"
+  local icon_line
+  local icon_path
+  local exec_binary
+
+  if [[ ! -f $desktop_file ]]; then
+    fail "$label desktop entry missing ($desktop_file)"
+    return
+  fi
+
+  pass "$label desktop entry present"
+
+  exec_binary=$(desktop_exec_binary "$desktop_file")
+  if [[ -n $exec_binary ]]; then
+    if leenium-cmd-present "$exec_binary"; then
+      pass "$label launcher command available ($exec_binary)"
+    else
+      warn "$label launcher command missing ($exec_binary)"
+    fi
+  else
+    warn "$label desktop entry has no readable Exec line"
+  fi
+
+  icon_line=$(sed -n 's/^Icon=//p' "$desktop_file" 2>/dev/null | head -1)
+  if [[ -n $icon_line && $icon_line == /* ]]; then
+    icon_path=${icon_line/%\%*/}
+    if [[ -f $icon_path ]]; then
+      pass "$label icon present"
+    else
+      warn "$label icon missing ($icon_path)"
+    fi
+  fi
+}
+
+find_desktop_entry_file() {
+  local desktop_id="$1"
+  local base
+
+  for base in "$HOME/.local/share/applications" "$HOME/.nix-profile/share/applications" "/usr/local/share/applications" "/usr/share/applications"; do
+    if [[ -f $base/$desktop_id ]]; then
+      echo "$base/$desktop_id"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+check_system_service_if_installed() {
+  local cmd="$1"
+  local unit="$2"
+  local label="$3"
+  local state
+
+  if ! leenium-cmd-present "$cmd"; then
+    return
+  fi
+
+  if ! systemctl list-unit-files --all 2>/dev/null | grep -q "^$unit "; then
+    warn "$label service unit not found ($unit)"
+    return
+  fi
+
+  state=$(systemctl is-enabled "$unit" 2>/dev/null || true)
+  case "$state" in
+    enabled)
+      pass "$label service enabled ($unit)"
+      ;;
+    static|indirect|generated|alias)
+      pass "$label service installed ($unit)"
+      ;;
+    disabled)
+      warn "$label service installed but disabled ($unit)"
+      ;;
+    *)
+      warn "$label service state unknown ($unit)"
+      ;;
+  esac
+}
+
+check_dir() {
+  local path="$1"
+  local label="$2"
+
+  if [[ -d $path ]]; then
+    pass "$label present ($path)"
+  else
+    fail "$label missing ($path)"
+  fi
+}
+
+check_file() {
+  local path="$1"
+  local label="$2"
+
+  if [[ -f $path ]]; then
+    pass "$label present ($path)"
+  else
+    fail "$label missing ($path)"
+  fi
+}
+
+check_command() {
+  local cmd="$1"
+  local label="$2"
+
+  if leenium-cmd-present "$cmd"; then
+    pass "$label available ($cmd)"
+  else
+    fail "$label missing ($cmd)"
+  fi
+}
+
+system_unit_exists() {
+  local unit="$1"
+
+  systemctl list-unit-files --all 2>/dev/null | grep -q "^$unit "
+}
+
+section "Install"
+check_dir "$LEENIUM_PATH" "Leenium root"
+check_dir "$LEENIUM_PATH/bin" "Command directory"
+check_dir "$LEENIUM_PATH/themes" "Theme directory"
+check_dir "$LEENIUM_PATH/default" "Default payload directory"
+check_file "$LEENIUM_PATH/version" "Version file"
+
+if [[ :$PATH: == *":$LEENIUM_PATH/bin:"* ]]; then
+  pass "Leenium bin directory is on PATH"
+else
+  warn "Leenium bin directory is not on PATH"
+fi
+
+if [[ -f $LEENIUM_PATH/version ]]; then
+  version=$(<"$LEENIUM_PATH/version")
+  if [[ -n $version ]]; then
+    pass "Version detected ($version)"
+  else
+    fail "Version file is empty"
+  fi
+fi
+
+section "Commands"
+check_command git "Git"
+check_command gum "Gum"
+check_command walker "Walker"
+check_command hyprctl "Hyprland control"
+check_command systemctl "Systemd"
+check_command leenium-theme-set "Theme command"
+check_command leenium-refresh-config "Refresh command"
+check_command leenium-update "Update command"
+check_command leenium-update-history "Update history command"
+check_command leenium-rollback "Rollback command"
+
+section "Config"
+check_dir "$USER_LEENIUM_DIR" "User Leenium config"
+check_dir "$USER_LEENIUM_DIR/current" "Active Leenium state"
+check_file "$USER_LEENIUM_DIR/current/theme.name" "Active theme marker"
+check_file "$USER_CONFIG_DIR/hypr/hyprland.conf" "Hyprland config"
+check_file "$USER_CONFIG_DIR/hypr/hyprlock.conf" "Hyprlock config"
+check_file "$USER_CONFIG_DIR/waybar/config.jsonc" "Waybar config"
+check_file "$USER_CONFIG_DIR/walker/config.toml" "Walker config"
+
+section "Apps"
+if [[ -f $USER_CONFIG_DIR/xdg-terminals.list ]]; then
+  terminal_desktop_id=$(sed -n '/^[^#[:space:]]/p' "$USER_CONFIG_DIR/xdg-terminals.list" | head -1)
+
+  if [[ -n $terminal_desktop_id ]]; then
+    terminal_desktop_file=$(find_desktop_entry_file "$terminal_desktop_id" || true)
+    if [[ -n $terminal_desktop_file ]]; then
+      check_desktop_entry "$terminal_desktop_file" "Preferred terminal"
+    else
+      fail "Preferred terminal desktop entry missing ($terminal_desktop_id)"
+    fi
+  else
+    warn "xdg-terminals.list exists but no preferred terminal is set"
+  fi
+else
+  warn "No xdg terminal preference file found"
+fi
+
+default_browser=$(xdg-settings get default-web-browser 2>/dev/null || true)
+if [[ -n $default_browser ]]; then
+  default_browser_file=$(find_desktop_entry_file "$default_browser" || true)
+  if [[ -n $default_browser_file ]]; then
+    check_desktop_entry "$default_browser_file" "Default browser"
+  else
+    fail "Default browser desktop entry missing ($default_browser)"
+  fi
+else
+  warn "No default browser is configured"
+fi
+
+editor_binary=${EDITOR:-nvim}
+if leenium-cmd-present "$editor_binary"; then
+  pass "Editor available ($editor_binary)"
+else
+  warn "Editor command missing ($editor_binary)"
+fi
+
+if [[ -f $HOME/.config/voxtype/config.toml ]]; then
+  if leenium-cmd-present voxtype wtype; then
+    pass "Voxtype integration dependencies available"
+  else
+    fail "Voxtype is configured but required commands are missing"
+  fi
+fi
+
+if leenium-cmd-present tailscale; then
+  pass "Tailscale installed"
+  check_system_service_if_installed tailscale tailscaled.service "Tailscale"
+
+  if [[ -f $HOME/.local/share/applications/Tailscale.desktop ]]; then
+    check_desktop_entry "$HOME/.local/share/applications/Tailscale.desktop" "Tailscale web app"
+  fi
+fi
+
+if leenium-cmd-present docker; then
+  pass "Docker installed"
+
+  if docker ps >/dev/null 2>&1; then
+    pass "Docker daemon reachable"
+  else
+    docker_service_state=""
+    docker_socket_state=""
+
+    if system_unit_exists docker.service; then
+      docker_service_state=$(systemctl is-enabled docker.service 2>/dev/null || true)
+    fi
+
+    if system_unit_exists docker.socket; then
+      docker_socket_state=$(systemctl is-enabled docker.socket 2>/dev/null || true)
+    fi
+
+    if [[ $docker_service_state == "enabled" ]] || [[ $docker_socket_state == "enabled" ]]; then
+      warn "Docker is installed but the daemon is not reachable for the current user"
+    elif [[ -n $docker_service_state ]] || [[ -n $docker_socket_state ]]; then
+      warn "Docker is installed but neither docker.service nor docker.socket is enabled"
+    else
+      warn "Docker installed but no docker systemd unit was found"
+    fi
+  fi
+fi
+
+steam_desktop_file=$(find_desktop_entry_file steam.desktop || true)
+if [[ -n $steam_desktop_file ]]; then
+  check_desktop_entry "$steam_desktop_file" "Steam"
+elif leenium-cmd-present steam; then
+  pass "Steam command available"
+fi
+
+lutris_desktop_file=$(find_desktop_entry_file net.lutris.Lutris.desktop || true)
+if [[ -n $lutris_desktop_file ]]; then
+  check_desktop_entry "$lutris_desktop_file" "Lutris"
+elif leenium-cmd-present lutris; then
+  pass "Lutris command available"
+fi
+
+gfn_desktop_file=$(find_desktop_entry_file com.nvidia.geforcenow.desktop || true)
+if [[ -z $gfn_desktop_file ]]; then
+  gfn_desktop_file=$(find_desktop_entry_file GeForceNOW.desktop || true)
+fi
+
+if [[ -n $gfn_desktop_file ]]; then
+  check_desktop_entry "$gfn_desktop_file" "GeForce NOW"
+fi
+
+local_app_count=0
+broken_local_apps=0
+while IFS= read -r desktop_file; do
+  [[ -n $desktop_file ]] || continue
+  app_name=$(basename "$desktop_file")
+  exec_line=$(desktop_exec_line "$desktop_file")
+  icon_line=$(sed -n 's/^Icon=//p' "$desktop_file" 2>/dev/null | head -1)
+
+  if [[ $exec_line != leenium-* ]] && [[ $exec_line != xdg-terminal-exec* ]] && [[ $icon_line != $HOME/.local/share/applications/icons/* ]]; then
+    continue
+  fi
+
+  ((local_app_count++))
+  exec_binary=$(desktop_exec_binary "$desktop_file")
+
+  if [[ -z $exec_binary ]]; then
+    warn "Local app $app_name has no readable Exec line"
+    ((broken_local_apps++))
+    continue
+  fi
+
+  if [[ $exec_binary == "leenium-launch-webapp" || $exec_binary == "xdg-terminal-exec" || $exec_binary == "gtk-launch" || $exec_binary == "uwsm-app" ]]; then
+    pass "Local app $app_name has a recognized launcher"
+  elif leenium-cmd-present "$exec_binary"; then
+    pass "Local app $app_name command available ($exec_binary)"
+  else
+    warn "Local app $app_name command missing ($exec_binary)"
+    ((broken_local_apps++))
+  fi
+
+  if [[ -n $icon_line && $icon_line == /* && ! -f $icon_line ]]; then
+    warn "Local app $app_name icon missing ($icon_line)"
+    ((broken_local_apps++))
+  fi
+done < <(find "$HOME/.local/share/applications" -maxdepth 1 -type f -name '*.desktop' 2>/dev/null | sort)
+
+if (( local_app_count == 0 )); then
+  pass "No local application launchers to validate"
+elif (( broken_local_apps == 0 )); then
+  pass "All local application launchers look valid"
+fi
+
+section "Rollback"
+history_file="$STATE_DIR/update-history.tsv"
+
+if [[ -f $history_file ]]; then
+  pass "Update history file present ($history_file)"
+
+  history_columns=$(awk -F'\t' 'NF > max { max = NF } END { print max + 0 }' "$history_file")
+  if (( history_columns >= 12 )); then
+    pass "Update history format includes snapshot IDs"
+  elif (( history_columns >= 11 )); then
+    warn "Update history exists but uses the older format without snapshot IDs"
+  else
+    warn "Update history file format looks incomplete"
+  fi
+else
+  warn "No update history file found yet"
+fi
+
+if leenium-update-history --json >/dev/null 2>&1; then
+  pass "Update history JSON output works"
+else
+  fail "Update history JSON output failed"
+fi
+
+if leenium-cmd-present snapper; then
+  pass "Snapper available for rollback"
+
+  if leenium-cmd-present limine-snapper-restore; then
+    pass "limine-snapper-restore available"
+  else
+    warn "limine-snapper-restore missing"
+  fi
+
+  if sudo snapper --csvout --no-headers list-configs >/dev/null 2>&1; then
+    pass "Snapper configs are readable"
+  else
+    warn "Snapper is installed but configs could not be read"
+  fi
+
+  if sudo snapper -c root --csvout --no-headers list --columns number >/dev/null 2>&1; then
+    pass "Root snapshots are listable"
+  else
+    warn "Snapper root snapshots could not be listed"
+  fi
+else
+  warn "Snapper not installed, rollback is unavailable"
+fi
+
+section "Theme"
+missing_theme_assets=0
+
+while IFS= read -r theme_dir; do
+  [[ -n $theme_dir ]] || continue
+
+  if [[ ! -f $theme_dir/colors.toml ]]; then
+    fail "Theme $(basename "$theme_dir") is missing colors.toml"
+    ((missing_theme_assets++))
+  fi
+
+  if [[ ! -f $theme_dir/preview.png ]]; then
+    warn "Theme $(basename "$theme_dir") is missing preview.png"
+  fi
+done < <(find "$LEENIUM_PATH/themes" -mindepth 1 -maxdepth 1 -type d | sort)
+
+if (( missing_theme_assets == 0 )); then
+  pass "All built-in themes include colors.toml"
+fi
+
+current_theme_name=""
+if [[ -f $USER_LEENIUM_DIR/current/theme.name ]]; then
+  current_theme_name=$(<"$USER_LEENIUM_DIR/current/theme.name")
+fi
+
+if [[ -n $current_theme_name ]]; then
+  if [[ -d $USER_LEENIUM_DIR/current/theme ]]; then
+    pass "Active theme directory exists"
+  else
+    fail "Active theme directory missing ($USER_LEENIUM_DIR/current/theme)"
+  fi
+
+  if [[ -d $LEENIUM_PATH/themes/$current_theme_name ]] || [[ -d $USER_LEENIUM_DIR/themes/$current_theme_name ]]; then
+    pass "Active theme source exists ($current_theme_name)"
+  else
+    fail "Active theme source missing ($current_theme_name)"
+  fi
+
+  if [[ -f $USER_LEENIUM_DIR/current/theme/colors.toml ]]; then
+    pass "Active theme colors.toml present"
+  else
+    warn "Active theme colors.toml missing"
+  fi
+else
+  warn "No active theme is recorded"
+fi
+
+template_count=$(find "$LEENIUM_PATH/default/themed" -maxdepth 1 -type f -name '*.tpl' | wc -l)
+if (( template_count > 0 )); then
+  pass "Theme templates present ($template_count files)"
+else
+  fail "No theme templates found in $LEENIUM_PATH/default/themed"
+fi
+
+section "Migrations"
+migration_total=$(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | wc -l)
+pending_migrations=0
+current_version=""
+previous_version="1.0.0"
+version_state_file="$STATE_DIR/version"
+
+version_lt() {
+  [[ $1 != "$2" ]] && [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+}
+
+version_le() {
+  [[ $1 == "$2" ]] || [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+}
+
+if [[ -f $LEENIUM_PATH/version ]]; then
+  current_version=$(<"$LEENIUM_PATH/version")
+fi
+
+if [[ -f $version_state_file ]]; then
+  previous_version=$(<"$version_state_file")
+fi
+
+while IFS= read -r migration_file; do
+  [[ -n $migration_file ]] || continue
+
+  migration_name=$(basename "$migration_file")
+  migration_version=$(sed -n 's/^MIGRATION_VERSION="\([^"]*\)"$/\1/p' "$migration_file" | head -n1)
+
+  if [[ -n $current_version && -n $migration_version ]] && (! version_lt "$previous_version" "$migration_version" || ! version_le "$migration_version" "$current_version"); then
+    continue
+  fi
+
+  if [[ ! -f $MIGRATIONS_STATE_DIR/$migration_name && ! -f $MIGRATIONS_STATE_DIR/skipped/$migration_name ]]; then
+    ((pending_migrations++))
+  fi
+done < <(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | sort)
+
+if (( migration_total == 0 )); then
+  pass "No migrations are currently shipped"
+elif (( pending_migrations == 0 )); then
+  pass "No pending migrations"
+else
+  warn "$pending_migrations migration(s) are pending"
+fi
+
+section "Services"
+if systemctl --user show-environment >/dev/null 2>&1; then
+  failed_units=$(systemctl --user --failed --no-legend --plain 2>/dev/null | sed '/^[[:space:]]*$/d')
+
+  if [[ -n $failed_units ]]; then
+    warn "User services have failed units"
+    echo "$failed_units"
+  else
+    pass "No failed user services"
+  fi
+
+  if systemctl --user list-unit-files | grep -q '^leenium-battery-monitor.timer'; then
+    battery_monitor_state=$(systemctl --user is-enabled leenium-battery-monitor.timer 2>/dev/null || true)
+
+    if [[ $battery_monitor_state == "enabled" ]]; then
+      pass "leenium-battery-monitor.timer is enabled"
+    else
+      warn "leenium-battery-monitor.timer is not enabled"
+    fi
+  else
+    warn "leenium-battery-monitor.timer is not installed for this user"
+  fi
+else
+  warn "systemctl --user is not available in this session"
+fi
+
+section "Git"
+if git -C "$LEENIUM_PATH" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  pass "Leenium root is a git repository"
+
+  branch=$(git -C "$LEENIUM_PATH" branch --show-current 2>/dev/null || true)
+  if [[ -n $branch ]]; then
+    pass "Current branch: $branch"
+  fi
+
+  if [[ -n $(git -C "$LEENIUM_PATH" status --short 2>/dev/null) ]]; then
+    warn "Leenium git tree has uncommitted changes"
+  else
+    pass "Leenium git tree is clean"
+  fi
+else
+  warn "Leenium root is not a git repository"
+fi
+
+section "Summary"
+echo "Passed:   $PASS_COUNT"
+echo "Warnings: $WARN_COUNT"
+echo "Failed:   $FAIL_COUNT"
+
+if (( FAIL_COUNT > 0 )); then
+  exit 1
+fi

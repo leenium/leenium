@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Append a Leenium update or rollback event to the local history log.
+
+STATE_DIR="$HOME/.local/state/leenium"
+HISTORY_FILE="$STATE_DIR/update-history.tsv"
+
+mkdir -p "$STATE_DIR"
+
+timestamp=""
+action=""
+status=""
+snapshot=""
+before_branch=""
+after_branch=""
+before_version=""
+after_version=""
+before_commit=""
+after_commit=""
+channel=""
+snapshot_ids=""
+
+while (( $# > 0 )); do
+  case "$1" in
+    --timestamp) timestamp="$2" ;;
+    --action) action="$2" ;;
+    --status) status="$2" ;;
+    --snapshot) snapshot="$2" ;;
+    --before-branch) before_branch="$2" ;;
+    --after-branch) after_branch="$2" ;;
+    --before-version) before_version="$2" ;;
+    --after-version) after_version="$2" ;;
+    --before-commit) before_commit="$2" ;;
+    --after-commit) after_commit="$2" ;;
+    --channel) channel="$2" ;;
+    --snapshot-ids) snapshot_ids="$2" ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift 2
+done
+
+if [[ -z $timestamp || -z $action || -z $status ]]; then
+  echo "Usage: leenium-update-history-record --timestamp <iso8601> --action <name> --status <status> [fields...]" >&2
+  exit 1
+fi
+
+printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+  "$timestamp" \
+  "$action" \
+  "$status" \
+  "$snapshot" \
+  "$before_branch" \
+  "$after_branch" \
+  "$before_version" \
+  "$after_version" \
+  "$before_commit" \
+  "$after_commit" \
+  "$channel" \
+  "$snapshot_ids" >>"$HISTORY_FILE"

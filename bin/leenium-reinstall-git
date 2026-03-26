@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# Reinstall the Leenium configuration directory from the git source.
+
+git clone --depth=1 "https://github.com/leenium/leenium.git" ~/.local/share/leenium-new >/dev/null
+mv $LEENIUM_PATH ~/.local/share/leenium-old
+mv ~/.local/share/leenium-new $LEENIUM_PATH

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Remove preinstalled Leenium applications (web apps, TUIs, and selected packages).
+# This removes all web apps, TUIs, plus specific desktop applications.
+
+if gum confirm "Are you sure you want to remove all preinstalled web apps, TUI wrappers, and desktop applications?"; then
+  echo -e "Removing preinstalled Leenium applications...\n"
+
+  leenium-webapp-remove-all
+  leenium-tui-remove-all
+
+  cp ~/.config/hypr/bindings.conf ~/.config/hypr/bindings.conf.bak
+  cp "$LEENIUM_PATH/default/hypr/plain-bindings.conf" ~/.config/hypr/bindings.conf
+  hyprctl reload
+
+  leenium-pkg-drop \
+    aether \
+    spotify \
+    libreoffice-fresh \
+    bitwarden \
+    bitwarden-cli \
+    xournalpp \
+    signal-desktop \
+    pinta \
+    obs-studio \
+    kdenlive \
+    lazydocker
+fi
