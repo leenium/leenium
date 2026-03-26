@@ -1,0 +1,3 @@
+[[ $- != *i* ]] && return
+
+source ~/.local/share/leenium/default/zsh/rc
