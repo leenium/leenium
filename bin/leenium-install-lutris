@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Install and launch Lutris.
+
+set -e
+
+leenium-pkg-add lutris
+setsid gtk-launch net.lutris.Lutris.desktop >/dev/null 2>&1 &

@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+leenium-launch-floating-terminal-with-presentation "voxtype setup model"
+leenium-restart-waybar
