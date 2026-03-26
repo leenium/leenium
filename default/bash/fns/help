@@ -1,0 +1,102 @@
+# Hhelp
+shellhelp() {
+  printf '%s%s shellhelp%s  %savailable shell shortcuts%s\n\n' "$_SHELL_UI_BOLD" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET" "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+
+  printf '%s%s Navigation%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-14s %s\n' 'c, cls' 'Clear the terminal'
+  printf '  %-14s %s\n' 'ls' 'List files with eza and icons'
+  printf '  %-14s %s\n' 'l' 'Long file list'
+  printf '  %-14s %s\n' 'll' 'Long all-files list'
+  printf '  %-14s %s\n' 'ld' 'Long directory-only list'
+  printf '  %-14s %s\n' 'lt' 'Tree view, depth 1'
+  printf '  %-14s %s\n' 'lz' 'Fallback plain ls alias'
+  printf '  %-14s %s\n' '.. / ... / .3' 'Go up directories quickly'
+  printf '  %-14s %s\n' '.4 / .5' 'Go up 4 or 5 directories'
+  printf '  %-14s %s\n\n' 'mkdir' 'Always create parent directories'
+
+  printf '%s%s Editors and Files%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-14s %s\n' 'vc' 'Open VS Code'
+  printf '  %-14s %s\n' 'vim' 'Use Neovim'
+  printf '  %-14s %s\n' 'cat' 'Use bat instead of cat'
+  printf '  %-14s %s\n' 'open PATH' 'Open a file or URL with xdg-open'
+  printf '  %-14s %s\n\n' 'opendir [PATH]' 'Open a directory in Nautilus'
+
+  printf '%s%s Compression and Media%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-24s %s\n' 'compress PATH' 'Create PATH.tar.gz from file or directory'
+  printf '  %-24s %s\n' 'decompress ARCHIVE' 'Extract a .tar.gz archive'
+  printf '  %-24s %s\n' 'transcode-video-1080p' 'Convert a video to 1080p H.264 MP4'
+  printf '  %-24s %s\n' 'transcode-video-4K' 'Convert a video to 4K H.265 MP4'
+  printf '  %-24s %s\n' 'img2jpg' 'Convert an image to JPG'
+  printf '  %-24s %s\n' 'img2jpg-small' 'Convert an image to small JPG'
+  printf '  %-24s %s\n' 'img2jpg-medium' 'Convert an image to medium JPG'
+  printf '  %-24s %s\n\n' 'img2png' 'Convert an image to optimized PNG'
+
+  printf '%s%s Packages%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_RESET"
+  printf '  %sOrchestration%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+  printf '    %-18s %s\n' 'update' 'Update repo packages and AUR packages'
+  printf '\n'
+  printf '  %sRepo Packages%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+  printf '    %-18s %s\n' 'pkg update' 'Update repo packages with pacman'
+  printf '    %-18s %s\n' 'pkg install PKG' 'Install package(s) with pacman'
+  printf '    %-18s %s\n' 'pkg remove PKG' 'Remove package(s) with pacman'
+  printf '    %-18s %s\n' 'pkg remove-deps' 'Remove package(s) and dependencies'
+  printf '    %-18s %s\n' 'pkg search QUERY' 'Search pacman repositories'
+  printf '    %-18s %s\n' 'pkg list' 'List installed packages'
+  printf '    %-18s %s\n' 'pkg info PKG' 'Show installed package info'
+  printf '    %-18s %s\n' 'pkg help' 'Show package command help'
+  printf '\n'
+  printf '  %sAUR Packages%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+  printf '    %-18s %s\n' 'aur update' 'Update AUR packages with yay'
+  printf '    %-18s %s\n' 'aur install PKG' 'Install AUR package(s) with yay'
+  printf '    %-18s %s\n' 'aur remove PKG' 'Remove AUR package(s)'
+  printf '    %-18s %s\n' 'aur remove-deps' 'Remove AUR package(s) with deps'
+  printf '    %-18s %s\n' 'aur search QUERY' 'Search AUR packages'
+  printf '    %-18s %s\n' 'aur list' 'List installed AUR packages'
+  printf '    %-18s %s\n' 'aur info PKG' 'Show AUR package info'
+  printf '    %-18s %s\n\n' 'aur help' 'Show AUR command help'
+
+  printf '%s%s Containers%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_DOCKER" "$_SHELL_UI_RESET"
+  printf '  %sDocker Engine%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+  printf '    %-18s %s\n' 'docker' 'Run docker through sudo'
+  printf '    %-18s %s\n' 'dockerstart' 'Start Docker service'
+  printf '    %-18s %s\n' 'dockerstop' 'Stop Docker service and socket'
+  printf '\n'
+  printf '  %sService Pattern%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+  printf '    %-18s %s\n' '<service> up' 'Create or start the service container'
+  printf '    %-18s %s\n' '<service> down' 'Stop the service container'
+  printf '    %-18s %s\n' '<service> status' 'Show runtime state and endpoint'
+  printf '    %-18s %s\n' '<service> config' 'Show current effective config'
+  printf '    %-18s %s\n' '<service> recreate' 'Recreate with new image/port/options'
+  printf '    %-18s %s\n' '<service> help' 'Show service-specific help'
+  printf '\n'
+  printf '  %sAvailable Services%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
+  printf '    %-18s %s\n' 'postgres' 'PostgreSQL plus pgAdmin'
+  printf '    %-18s %s\n' 'mongo' 'MongoDB'
+  printf '    %-18s %s\n' 'redis' 'Redis'
+  printf '    %-18s %s\n' 'searx' 'SearXNG'
+  printf '\n'
+
+  printf '%s%s Drives%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-24s %s\n' 'iso2sd ISO [DEVICE]' 'Write an ISO file to an SD/USB drive'
+  printf '  %-24s %s\n\n' 'format-drive DEVICE NAME' 'Erase and format a drive as exFAT'
+
+  printf '%s%s SSH Port Forwarding%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_NET" "$_SHELL_UI_RESET"
+  printf '  %-24s %s\n' 'fip HOST PORT...' 'Forward one or more local ports over SSH'
+  printf '  %-24s %s\n' 'dip PORT...' 'Stop forwarded local ports'
+  printf '  %-24s %s\n\n' 'lip' 'List active SSH local forwards'
+
+  printf '%s%s Tmux%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-24s %s\n' 'tdl AI [AI2]' 'Create a dev layout with editor, AI, terminal'
+  printf '  %-24s %s\n' 'tdlm AI [AI2]' 'Create one tmux dev layout per subdirectory'
+  printf '  %-24s %s\n\n' 'tsl COUNT CMD' 'Start the same command in multiple tmux panes'
+
+  printf '%s%s Git Worktrees%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-24s %s\n' 'ga BRANCH' 'Create a new worktree and branch'
+  printf '  %-24s %s\n\n' 'gd' 'Remove the current worktree and branch'
+
+  printf '%s%s Network and Notify%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_NET" "$_SHELL_UI_RESET"
+  printf '  %-14s %s\n' 'send-notif' 'Send a message to your ntfy topic'
+
+  printf '%s%s Help%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
+  printf '  %-14s %s\n' 'shellhelp' 'Show this help page'
+}

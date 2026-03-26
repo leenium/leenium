@@ -1,0 +1,58 @@
+ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+
+# ====== ZINIT INSTALL ======
+if [[ -t 1 && ! -f $ZINIT_HOME/zinit.zsh ]] && command -v git >/dev/null 2>&1; then
+  mkdir -p "${ZINIT_HOME:h}"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME" >/dev/null 2>&1 || true
+fi
+
+# ====== ZINIT PLUGINS ======
+if [[ -f $ZINIT_HOME/zinit.zsh ]]; then
+  source "$ZINIT_HOME/zinit.zsh"
+
+  zinit ice depth=1; zinit light romkatv/powerlevel10k
+  zinit light zsh-users/zsh-completions
+  zinit light Aloxaf/fzf-tab
+  zinit light zsh-users/zsh-autosuggestions
+  zinit light zsh-users/zsh-syntax-highlighting
+
+  zinit snippet OMZP::git
+  zinit snippet OMZP::sudo
+  zinit snippet OMZP::archlinux
+  zinit snippet OMZP::aws
+  zinit snippet OMZP::kubectl
+  zinit snippet OMZP::kubectx
+  zinit snippet OMZP::command-not-found
+
+  # Ctrl + R => History
+  source <(fzf --zsh)
+  # Disable Completion Case Sensivity
+  zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+  zstyle ':completion:*' list-colors '${(s.:.)LS_COLORS}'
+  zstyle ':completion:*' menu-no
+
+  autoload -U compinit && compinit
+
+  zinit cdreplay -q
+fi
+
+# ====== MISE ACTIVATION ======
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
+
+if [[ -t 1 ]] && command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+# ====== ZOXIDE (smarter CD command) ======
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
+if [[ -t 1 ]] && command -v try >/dev/null 2>&1; then
+  eval "$(SHELL=/bin/zsh command try init ~/Work/tries)"
+fi
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

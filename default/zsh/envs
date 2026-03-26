@@ -1,0 +1,11 @@
+# Editor used by CLI
+export SUDO_EDITOR="$EDITOR"
+export BAT_THEME=ansi
+
+# Duplicated from .config/uwsm/env so SSH works too
+export LEENIUM_PATH=$HOME/.local/share/leenium
+export PATH=$LEENIUM_PATH/bin:$PATH:$HOME/.local/bin
+export SHELL=/usr/bin/zsh
+
+# export NTFY_TOPIC=""
+# export MISE_GITHUB_TOKEN=""

@@ -1,0 +1,8 @@
+# History search bindings
+bindkey -e # Activate EMACS mode
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
+[[ -n ${terminfo[kcuu1]-} ]] && bindkey "${terminfo[kcuu1]}" history-search-backward
+[[ -n ${terminfo[kcud1]-} ]] && bindkey "${terminfo[kcud1]}" history-search-forward

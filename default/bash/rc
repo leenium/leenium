@@ -1,0 +1,6 @@
+source ~/.local/share/leenium/default/bash/envs
+source ~/.local/share/leenium/default/bash/shell
+source ~/.local/share/leenium/default/bash/aliases
+source ~/.local/share/leenium/default/bash/functions
+source ~/.local/share/leenium/default/bash/init
+[[ $- == *i* ]] && bind -f ~/.local/share/leenium/default/bash/inputrc
