@@ -106,8 +106,6 @@ python-poetry-core
 python-terminaltexteffects
 qt5-wayland
 ripgrep
-ruby
-rust
 satty
 sddm
 signal-desktop
