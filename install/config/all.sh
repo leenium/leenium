@@ -41,7 +41,6 @@ run_logged $LEENIUM_INSTALL/config/hardware/intel/video-acceleration.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel/lpmd.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel-thermald.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel/ipu7-camera.sh
-
 run_logged $LEENIUM_INSTALL/config/hardware/intel/ptl-kernel.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel/fix-wifi7-eht.sh
 
@@ -61,6 +60,5 @@ run_logged $LEENIUM_INSTALL/config/hardware/apple/fix-t2.sh
 run_logged $LEENIUM_INSTALL/config/hardware/fix-bcm43xx.sh
 run_logged $LEENIUM_INSTALL/config/hardware/fix-surface-keyboard.sh
 run_logged $LEENIUM_INSTALL/config/hardware/fix-yt6801-ethernet-adapter.sh
-run_logged $LEENIUM_INSTALL/config/hardware/fix-dell-xps-audio.sh
 run_logged $LEENIUM_INSTALL/config/hardware/fix-synaptic-touchpad.sh
 run_logged $LEENIUM_INSTALL/config/hardware/fix-tuxedo-backlight.sh
