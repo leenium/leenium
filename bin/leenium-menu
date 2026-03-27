@@ -661,20 +661,20 @@ show_remove_ai_menu() {
 }
 
 show_remove_development_menu() {
-  case $(menu "Remove" "󰫏  Ruby on Rails\n  JavaScript\n  Go\n  PHP\n  Python\n  Elixir\n  Zig\n  Rust\n  Java\n  .NET\n  OCaml\n  Clojure\n  Scala") in
-  *Rails*) present_terminal "leenium-remove-dev-env ruby" ;;
-  *JavaScript*) show_remove_javascript_menu ;;
-  *Go*) present_terminal "leenium-remove-dev-env go" ;;
-  *PHP*) show_remove_php_menu ;;
-  *Python*) present_terminal "leenium-remove-dev-env python" ;;
+  case $(menu "Remove" "  Clojure\n  Elixir\n  Go\n  Java\n  JavaScript\n  .NET\n  OCaml\n  PHP\n  Python\n󰫏  Ruby on Rails\n  Rust\n  Scala\n  Zig") in
+  *Clojure*) present_terminal "leenium-remove-dev-env clojure" ;;
   *Elixir*) show_remove_elixir_menu ;;
-  *Zig*) present_terminal "leenium-remove-dev-env zig" ;;
-  *Rust*) present_terminal "leenium-remove-dev-env rust" ;;
+  *Go*) present_terminal "leenium-remove-dev-env go" ;;
   *Java*) present_terminal "leenium-remove-dev-env java" ;;
+  *JavaScript*) show_remove_javascript_menu ;;
   *NET*) present_terminal "leenium-remove-dev-env dotnet" ;;
   *OCaml*) present_terminal "leenium-remove-dev-env ocaml" ;;
-  *Clojure*) present_terminal "leenium-remove-dev-env clojure" ;;
+  *PHP*) show_remove_php_menu ;;
+  *Python*) present_terminal "leenium-remove-dev-env python" ;;
+  *Rails*) present_terminal "leenium-remove-dev-env ruby" ;;
+  *Rust*) present_terminal "leenium-remove-dev-env rust" ;;
   *Scala*) present_terminal "leenium-remove-dev-env scala" ;;
+  *Zig*) present_terminal "leenium-remove-dev-env zig" ;;
   *) show_remove_menu ;;
   esac
 }
