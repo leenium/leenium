@@ -91,6 +91,31 @@ ocaml)
   rm -rf ~/.opam 2>/dev/null || true
   sudo rm -f /usr/local/bin/opam 2>/dev/null || true
   ;;
+claude-code)
+  echo -e "Removing Claude Code...\n"
+  mise uninstall claude-code --all
+  mise rm -g claude-code
+  ;;
+codex)
+  echo -e "Removing Codex...\n"
+  mise uninstall codex --all
+  mise rm -g codex
+  ;;
+crush)
+  echo -e "Removing Crush...\n"
+  mise uninstall crush --all
+  mise rm -g crush
+  ;;
+gemini-cli)
+  echo -e "Removing Crush...\n"
+  mise uninstall gemini-cli --all
+  mise rm -g gemini-cli
+  ;;
+opencode)
+  echo -e "Removing OpenCode...\n"
+  mise uninstall opencode --all
+  mise rm -g opencode
+  ;;
 clojure)
   echo -e "Removing Clojure...\n"
   mise uninstall clojure --all
