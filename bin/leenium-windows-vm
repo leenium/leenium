@@ -170,7 +170,7 @@ EOF
     exit 1
   fi
 
-  mkdir -p $HOME/Windows
+  mkdir -p "$HOME/Windows"
 
   # Create docker-compose.yml in user config directory
   cat << EOF | tee "$COMPOSE_FILE" > /dev/null

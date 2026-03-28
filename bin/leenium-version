@@ -1,2 +1,2 @@
 #!/bin/bash
-cat $LEENIUM_PATH/version
+cat "$LEENIUM_PATH/version"

@@ -3,7 +3,7 @@
 # Locks the system using hyprlock, and stops the screensaver first.
 
 # Lock the screen
-pidof hyprlock || hyprlock &
+pidof hyprlock || hyprlock >/dev/null 2>&1 &
 
 # Set keyboard layout to default (first layout)
 hyprctl switchxkblayout all 0 > /dev/null 2>&1
