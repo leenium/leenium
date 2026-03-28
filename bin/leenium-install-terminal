@@ -33,11 +33,11 @@ com.mitchellh.ghostty.desktop)
 esac
 
 # Install package
-if leenium-pkg-add $package; then
+if leenium-pkg-add "$package"; then
   # Copy custom desktop entry for alacritty with X-TerminalArg* keys
   if [[ $package == "alacritty" ]]; then
     mkdir -p ~/.local/share/applications
-    cp $LEENIUM_PATH/applications/Alacritty.desktop ~/.local/share/applications/
+    cp "$LEENIUM_PATH/applications/Alacritty.desktop" ~/.local/share/applications/
   fi
 
   # Update xdg-terminals.list to prioritize the proper terminal

@@ -30,4 +30,4 @@ if ! git clone "$REPO_URL" "$THEME_PATH"; then
 fi
 
 # Apply the new theme with leenium-theme-set
-leenium-theme-set $THEME_NAME
+leenium-theme-set "$THEME_NAME"

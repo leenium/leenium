@@ -21,11 +21,16 @@ if [[ -f $COLORS_FILE ]]; then
     value="${value#*[\"\']}"
     value="${value%%[\"\']*}" # extract value between quotes (ignores inline comments)
 
-    printf 's|{{ %s }}|%s|g\n' "$key" "$value"            # {{ key }} -> value
-    printf 's|{{ %s_strip }}|%s|g\n' "$key" "${value#\#}" # {{ key_strip }} -> value without leading #
+    value_escaped=$(printf '%s' "$value" | sed 's/[[\.*^$/&]/\\&/g')
+    value_stripped="${value#\#}"
+    value_stripped_escaped=$(printf '%s' "$value_stripped" | sed 's/[[\.*^$/&]/\\&/g')
+
+    printf 's|{{ %s }}|%s|g\n' "$key" "$value_escaped"            # {{ key }} -> value
+    printf 's|{{ %s_strip }}|%s|g\n' "$key" "$value_stripped_escaped" # {{ key_strip }} -> value without leading #
     if [[ $value =~ ^# ]]; then
       rgb=$(hex_to_rgb "$value")
-      echo "s|{{ ${key}_rgb }}|${rgb}|g"
+      rgb_escaped=$(printf '%s' "$rgb" | sed 's/[[\.*^$/&]/\\&/g')
+      echo "s|{{ ${key}_rgb }}|${rgb_escaped}|g"
     fi
   done <"$COLORS_FILE" >"$sed_script"
 

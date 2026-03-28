@@ -3,4 +3,4 @@
 # Refresh the SDDM theme from default
 
 sudo rm -rf /usr/share/sddm/themes/leenium
-sudo cp -r $LEENIUM_PATH/default/sddm/leenium /usr/share/sddm/themes/leenium
+sudo cp -r "$LEENIUM_PATH/default/sddm/leenium" /usr/share/sddm/themes/leenium

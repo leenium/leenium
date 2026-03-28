@@ -12,20 +12,45 @@ PASS_COUNT=0
 WARN_COUNT=0
 FAIL_COUNT=0
 
+QUICK_MODE=false
+JSON_OUTPUT=false
+TARGET_SECTION=""
+SECTION_RESULTS="{}"
+
 print_usage() {
   cat <<EOF
-Usage: leenium-doctor
+Usage: leenium-doctor [OPTIONS]
 
 Checks the local Leenium installation for common configuration, theme, migration,
 and service problems.
+
+Options:
+  --quick        Skip script syntax checks for faster execution
+  --json         Output results in JSON format
+  --section SEC  Run only the specified section (e.g., --section scripts)
+  -h, --help     Show this help message
+
+Sections: install, commands, config, apps, rollback, theme, migrations,
+          services, git, scripts, hooks, variables, dependencies,
+          desktop, network, disk, permissions
 EOF
 }
 
-if (( $# > 0 )); then
+while (( $# > 0 )); do
   case "$1" in
     -h|--help)
       print_usage
       exit 0
+      ;;
+    --quick)
+      QUICK_MODE=true
+      ;;
+    --json)
+      JSON_OUTPUT=true
+      ;;
+    --section)
+      TARGET_SECTION="$2"
+      shift
       ;;
     *)
       echo "Unknown option: $1"
@@ -34,26 +59,57 @@ if (( $# > 0 )); then
       exit 1
       ;;
   esac
-fi
+  shift
+done
+
+run_section() {
+  local section_name="$1"
+  local section_func="$2"
+
+  if [[ -n $TARGET_SECTION ]]; then
+    if [[ "$TARGET_SECTION" == "$section_name" ]]; then
+      $section_func
+    fi
+  else
+    $section_func
+  fi
+}
 
 pass() {
-  echo -e "\e[32mPASS\e[0m $1"
+  local msg="$1"
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "{\"status\":\"pass\",\"message\":\"$msg\"}"
+  else
+    echo -e "\e[32mPASS\e[0m $1"
+  fi
   ((PASS_COUNT++))
 }
 
 warn() {
-  echo -e "\e[33mWARN\e[0m $1"
+  local msg="$1"
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "{\"status\":\"warn\",\"message\":\"$msg\"}"
+  else
+    echo -e "\e[33mWARN\e[0m $1"
+  fi
   ((WARN_COUNT++))
 }
 
 fail() {
-  echo -e "\e[31mFAIL\e[0m $1"
+  local msg="$1"
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "{\"status\":\"fail\",\"message\":\"$msg\"}"
+  else
+    echo -e "\e[31mFAIL\e[0m $1"
+  fi
   ((FAIL_COUNT++))
 }
 
 section() {
-  echo
-  echo -e "\e[1m$1\e[0m"
+  if [[ "$JSON_OUTPUT" != "true" ]]; then
+    echo
+    echo -e "\e[1m$1\e[0m"
+  fi
 }
 
 desktop_exec_binary() {
@@ -200,391 +256,716 @@ system_unit_exists() {
   systemctl list-unit-files --all 2>/dev/null | grep -q "^$unit "
 }
 
-section "Install"
-check_dir "$LEENIUM_PATH" "Leenium root"
-check_dir "$LEENIUM_PATH/bin" "Command directory"
-check_dir "$LEENIUM_PATH/themes" "Theme directory"
-check_dir "$LEENIUM_PATH/default" "Default payload directory"
-check_file "$LEENIUM_PATH/version" "Version file"
+section_install() {
+  section "Install"
+  check_dir "$LEENIUM_PATH" "Leenium root"
+  check_dir "$LEENIUM_PATH/bin" "Command directory"
+  check_dir "$LEENIUM_PATH/themes" "Theme directory"
+  check_dir "$LEENIUM_PATH/default" "Default payload directory"
+  check_file "$LEENIUM_PATH/version" "Version file"
 
-if [[ :$PATH: == *":$LEENIUM_PATH/bin:"* ]]; then
-  pass "Leenium bin directory is on PATH"
-else
-  warn "Leenium bin directory is not on PATH"
-fi
-
-if [[ -f $LEENIUM_PATH/version ]]; then
-  version=$(<"$LEENIUM_PATH/version")
-  if [[ -n $version ]]; then
-    pass "Version detected ($version)"
+  if [[ :$PATH: == *":$LEENIUM_PATH/bin:"* ]]; then
+    pass "Leenium bin directory is on PATH"
   else
-    fail "Version file is empty"
+    warn "Leenium bin directory is not on PATH"
   fi
-fi
 
-section "Commands"
-check_command git "Git"
-check_command gum "Gum"
-check_command walker "Walker"
-check_command hyprctl "Hyprland control"
-check_command systemctl "Systemd"
-check_command leenium-theme-set "Theme command"
-check_command leenium-refresh-config "Refresh command"
-check_command leenium-update "Update command"
-check_command leenium-update-history "Update history command"
-check_command leenium-rollback "Rollback command"
-
-section "Config"
-check_dir "$USER_LEENIUM_DIR" "User Leenium config"
-check_dir "$USER_LEENIUM_DIR/current" "Active Leenium state"
-check_file "$USER_LEENIUM_DIR/current/theme.name" "Active theme marker"
-check_file "$USER_CONFIG_DIR/hypr/hyprland.conf" "Hyprland config"
-check_file "$USER_CONFIG_DIR/hypr/hyprlock.conf" "Hyprlock config"
-check_file "$USER_CONFIG_DIR/waybar/config.jsonc" "Waybar config"
-check_file "$USER_CONFIG_DIR/walker/config.toml" "Walker config"
-
-section "Apps"
-if [[ -f $USER_CONFIG_DIR/xdg-terminals.list ]]; then
-  terminal_desktop_id=$(sed -n '/^[^#[:space:]]/p' "$USER_CONFIG_DIR/xdg-terminals.list" | head -1)
-
-  if [[ -n $terminal_desktop_id ]]; then
-    terminal_desktop_file=$(find_desktop_entry_file "$terminal_desktop_id" || true)
-    if [[ -n $terminal_desktop_file ]]; then
-      check_desktop_entry "$terminal_desktop_file" "Preferred terminal"
+  if [[ -f $LEENIUM_PATH/version ]]; then
+    version=$(<"$LEENIUM_PATH/version")
+    if [[ -n $version ]]; then
+      pass "Version detected ($version)"
     else
-      fail "Preferred terminal desktop entry missing ($terminal_desktop_id)"
-    fi
-  else
-    warn "xdg-terminals.list exists but no preferred terminal is set"
-  fi
-else
-  warn "No xdg terminal preference file found"
-fi
-
-default_browser=$(xdg-settings get default-web-browser 2>/dev/null || true)
-if [[ -n $default_browser ]]; then
-  default_browser_file=$(find_desktop_entry_file "$default_browser" || true)
-  if [[ -n $default_browser_file ]]; then
-    check_desktop_entry "$default_browser_file" "Default browser"
-  else
-    fail "Default browser desktop entry missing ($default_browser)"
-  fi
-else
-  warn "No default browser is configured"
-fi
-
-editor_binary=${EDITOR:-nvim}
-if leenium-cmd-present "$editor_binary"; then
-  pass "Editor available ($editor_binary)"
-else
-  warn "Editor command missing ($editor_binary)"
-fi
-
-if [[ -f $HOME/.config/voxtype/config.toml ]]; then
-  if leenium-cmd-present voxtype wtype; then
-    pass "Voxtype integration dependencies available"
-  else
-    fail "Voxtype is configured but required commands are missing"
-  fi
-fi
-
-if leenium-cmd-present tailscale; then
-  pass "Tailscale installed"
-  check_system_service_if_installed tailscale tailscaled.service "Tailscale"
-
-  if [[ -f $HOME/.local/share/applications/Tailscale.desktop ]]; then
-    check_desktop_entry "$HOME/.local/share/applications/Tailscale.desktop" "Tailscale web app"
-  fi
-fi
-
-if leenium-cmd-present docker; then
-  pass "Docker installed"
-
-  if docker ps >/dev/null 2>&1; then
-    pass "Docker daemon reachable"
-  else
-    docker_service_state=""
-    docker_socket_state=""
-
-    if system_unit_exists docker.service; then
-      docker_service_state=$(systemctl is-enabled docker.service 2>/dev/null || true)
-    fi
-
-    if system_unit_exists docker.socket; then
-      docker_socket_state=$(systemctl is-enabled docker.socket 2>/dev/null || true)
-    fi
-
-    if [[ $docker_service_state == "enabled" ]] || [[ $docker_socket_state == "enabled" ]]; then
-      warn "Docker is installed but the daemon is not reachable for the current user"
-    elif [[ -n $docker_service_state ]] || [[ -n $docker_socket_state ]]; then
-      warn "Docker is installed but neither docker.service nor docker.socket is enabled"
-    else
-      warn "Docker installed but no docker systemd unit was found"
+      fail "Version file is empty"
     fi
   fi
-fi
-
-steam_desktop_file=$(find_desktop_entry_file steam.desktop || true)
-if [[ -n $steam_desktop_file ]]; then
-  check_desktop_entry "$steam_desktop_file" "Steam"
-elif leenium-cmd-present steam; then
-  pass "Steam command available"
-fi
-
-lutris_desktop_file=$(find_desktop_entry_file net.lutris.Lutris.desktop || true)
-if [[ -n $lutris_desktop_file ]]; then
-  check_desktop_entry "$lutris_desktop_file" "Lutris"
-elif leenium-cmd-present lutris; then
-  pass "Lutris command available"
-fi
-
-gfn_desktop_file=$(find_desktop_entry_file com.nvidia.geforcenow.desktop || true)
-if [[ -z $gfn_desktop_file ]]; then
-  gfn_desktop_file=$(find_desktop_entry_file GeForceNOW.desktop || true)
-fi
-
-if [[ -n $gfn_desktop_file ]]; then
-  check_desktop_entry "$gfn_desktop_file" "GeForce NOW"
-fi
-
-local_app_count=0
-broken_local_apps=0
-while IFS= read -r desktop_file; do
-  [[ -n $desktop_file ]] || continue
-  app_name=$(basename "$desktop_file")
-  exec_line=$(desktop_exec_line "$desktop_file")
-  icon_line=$(sed -n 's/^Icon=//p' "$desktop_file" 2>/dev/null | head -1)
-
-  if [[ $exec_line != leenium-* ]] && [[ $exec_line != xdg-terminal-exec* ]] && [[ $icon_line != $HOME/.local/share/applications/icons/* ]]; then
-    continue
-  fi
-
-  ((local_app_count++))
-  exec_binary=$(desktop_exec_binary "$desktop_file")
-
-  if [[ -z $exec_binary ]]; then
-    warn "Local app $app_name has no readable Exec line"
-    ((broken_local_apps++))
-    continue
-  fi
-
-  if [[ $exec_binary == "leenium-launch-webapp" || $exec_binary == "xdg-terminal-exec" || $exec_binary == "gtk-launch" || $exec_binary == "uwsm-app" ]]; then
-    pass "Local app $app_name has a recognized launcher"
-  elif leenium-cmd-present "$exec_binary"; then
-    pass "Local app $app_name command available ($exec_binary)"
-  else
-    warn "Local app $app_name command missing ($exec_binary)"
-    ((broken_local_apps++))
-  fi
-
-  if [[ -n $icon_line && $icon_line == /* && ! -f $icon_line ]]; then
-    warn "Local app $app_name icon missing ($icon_line)"
-    ((broken_local_apps++))
-  fi
-done < <(find "$HOME/.local/share/applications" -maxdepth 1 -type f -name '*.desktop' 2>/dev/null | sort)
-
-if (( local_app_count == 0 )); then
-  pass "No local application launchers to validate"
-elif (( broken_local_apps == 0 )); then
-  pass "All local application launchers look valid"
-fi
-
-section "Rollback"
-history_file="$STATE_DIR/update-history.tsv"
-
-if [[ -f $history_file ]]; then
-  pass "Update history file present ($history_file)"
-
-  history_columns=$(awk -F'\t' 'NF > max { max = NF } END { print max + 0 }' "$history_file")
-  if (( history_columns >= 12 )); then
-    pass "Update history format includes snapshot IDs"
-  elif (( history_columns >= 11 )); then
-    warn "Update history exists but uses the older format without snapshot IDs"
-  else
-    warn "Update history file format looks incomplete"
-  fi
-else
-  warn "No update history file found yet"
-fi
-
-if leenium-update-history --json >/dev/null 2>&1; then
-  pass "Update history JSON output works"
-else
-  fail "Update history JSON output failed"
-fi
-
-if leenium-cmd-present snapper; then
-  pass "Snapper available for rollback"
-
-  if leenium-cmd-present limine-snapper-restore; then
-    pass "limine-snapper-restore available"
-  else
-    warn "limine-snapper-restore missing"
-  fi
-
-  if sudo snapper --csvout --no-headers list-configs >/dev/null 2>&1; then
-    pass "Snapper configs are readable"
-  else
-    warn "Snapper is installed but configs could not be read"
-  fi
-
-  if sudo snapper -c root --csvout --no-headers list --columns number >/dev/null 2>&1; then
-    pass "Root snapshots are listable"
-  else
-    warn "Snapper root snapshots could not be listed"
-  fi
-else
-  warn "Snapper not installed, rollback is unavailable"
-fi
-
-section "Theme"
-missing_theme_assets=0
-
-while IFS= read -r theme_dir; do
-  [[ -n $theme_dir ]] || continue
-
-  if [[ ! -f $theme_dir/colors.toml ]]; then
-    fail "Theme $(basename "$theme_dir") is missing colors.toml"
-    ((missing_theme_assets++))
-  fi
-
-  if [[ ! -f $theme_dir/preview.png ]]; then
-    warn "Theme $(basename "$theme_dir") is missing preview.png"
-  fi
-done < <(find "$LEENIUM_PATH/themes" -mindepth 1 -maxdepth 1 -type d | sort)
-
-if (( missing_theme_assets == 0 )); then
-  pass "All built-in themes include colors.toml"
-fi
-
-current_theme_name=""
-if [[ -f $USER_LEENIUM_DIR/current/theme.name ]]; then
-  current_theme_name=$(<"$USER_LEENIUM_DIR/current/theme.name")
-fi
-
-if [[ -n $current_theme_name ]]; then
-  if [[ -d $USER_LEENIUM_DIR/current/theme ]]; then
-    pass "Active theme directory exists"
-  else
-    fail "Active theme directory missing ($USER_LEENIUM_DIR/current/theme)"
-  fi
-
-  if [[ -d $LEENIUM_PATH/themes/$current_theme_name ]] || [[ -d $USER_LEENIUM_DIR/themes/$current_theme_name ]]; then
-    pass "Active theme source exists ($current_theme_name)"
-  else
-    fail "Active theme source missing ($current_theme_name)"
-  fi
-
-  if [[ -f $USER_LEENIUM_DIR/current/theme/colors.toml ]]; then
-    pass "Active theme colors.toml present"
-  else
-    warn "Active theme colors.toml missing"
-  fi
-else
-  warn "No active theme is recorded"
-fi
-
-template_count=$(find "$LEENIUM_PATH/default/themed" -maxdepth 1 -type f -name '*.tpl' | wc -l)
-if (( template_count > 0 )); then
-  pass "Theme templates present ($template_count files)"
-else
-  fail "No theme templates found in $LEENIUM_PATH/default/themed"
-fi
-
-section "Migrations"
-migration_total=$(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | wc -l)
-pending_migrations=0
-current_version=""
-previous_version="1.0.0"
-version_state_file="$STATE_DIR/version"
-
-version_lt() {
-  [[ $1 != "$2" ]] && [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
 }
 
-version_le() {
-  [[ $1 == "$2" ]] || [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+section_commands() {
+  section "Commands"
+  check_command git "Git"
+  check_command gum "Gum"
+  check_command walker "Walker"
+  check_command hyprctl "Hyprland control"
+  check_command systemctl "Systemd"
+  check_command leenium-theme-set "Theme command"
+  check_command leenium-refresh-config "Refresh command"
+  check_command leenium-update "Update command"
+  check_command leenium-update-history "Update history command"
+  check_command leenium-rollback "Rollback command"
 }
 
-if [[ -f $LEENIUM_PATH/version ]]; then
-  current_version=$(<"$LEENIUM_PATH/version")
-fi
+section_config() {
+  section "Config"
+  check_dir "$USER_LEENIUM_DIR" "User Leenium config"
+  check_dir "$USER_LEENIUM_DIR/current" "Active Leenium state"
+  check_file "$USER_LEENIUM_DIR/current/theme.name" "Active theme marker"
+  check_file "$USER_CONFIG_DIR/hypr/hyprland.conf" "Hyprland config"
+  check_file "$USER_CONFIG_DIR/hypr/hyprlock.conf" "Hyprlock config"
+  check_file "$USER_CONFIG_DIR/waybar/config.jsonc" "Waybar config"
+  check_file "$USER_CONFIG_DIR/walker/config.toml" "Walker config"
+}
 
-if [[ -f $version_state_file ]]; then
-  previous_version=$(<"$version_state_file")
-fi
+section_apps() {
+  section "Apps"
+  if [[ -f $USER_CONFIG_DIR/xdg-terminals.list ]]; then
+    terminal_desktop_id=$(sed -n '/^[^#[:space:]]/p' "$USER_CONFIG_DIR/xdg-terminals.list" | head -1)
 
-while IFS= read -r migration_file; do
-  [[ -n $migration_file ]] || continue
-
-  migration_name=$(basename "$migration_file")
-  migration_version=$(sed -n 's/^MIGRATION_VERSION="\([^"]*\)"$/\1/p' "$migration_file" | head -n1)
-
-  if [[ -n $current_version && -n $migration_version ]] && (! version_lt "$previous_version" "$migration_version" || ! version_le "$migration_version" "$current_version"); then
-    continue
-  fi
-
-  if [[ ! -f $MIGRATIONS_STATE_DIR/$migration_name && ! -f $MIGRATIONS_STATE_DIR/skipped/$migration_name ]]; then
-    ((pending_migrations++))
-  fi
-done < <(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | sort)
-
-if (( migration_total == 0 )); then
-  pass "No migrations are currently shipped"
-elif (( pending_migrations == 0 )); then
-  pass "No pending migrations"
-else
-  warn "$pending_migrations migration(s) are pending"
-fi
-
-section "Services"
-if systemctl --user show-environment >/dev/null 2>&1; then
-  failed_units=$(systemctl --user --failed --no-legend --plain 2>/dev/null | sed '/^[[:space:]]*$/d')
-
-  if [[ -n $failed_units ]]; then
-    warn "User services have failed units"
-    echo "$failed_units"
-  else
-    pass "No failed user services"
-  fi
-
-  if systemctl --user list-unit-files | grep -q '^leenium-battery-monitor.timer'; then
-    battery_monitor_state=$(systemctl --user is-enabled leenium-battery-monitor.timer 2>/dev/null || true)
-
-    if [[ $battery_monitor_state == "enabled" ]]; then
-      pass "leenium-battery-monitor.timer is enabled"
+    if [[ -n $terminal_desktop_id ]]; then
+      terminal_desktop_file=$(find_desktop_entry_file "$terminal_desktop_id" || true)
+      if [[ -n $terminal_desktop_file ]]; then
+        check_desktop_entry "$terminal_desktop_file" "Preferred terminal"
+      else
+        fail "Preferred terminal desktop entry missing ($terminal_desktop_id)"
+      fi
     else
-      warn "leenium-battery-monitor.timer is not enabled"
+      warn "xdg-terminals.list exists but no preferred terminal is set"
     fi
   else
-    warn "leenium-battery-monitor.timer is not installed for this user"
-  fi
-else
-  warn "systemctl --user is not available in this session"
-fi
-
-section "Git"
-if git -C "$LEENIUM_PATH" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  pass "Leenium root is a git repository"
-
-  branch=$(git -C "$LEENIUM_PATH" branch --show-current 2>/dev/null || true)
-  if [[ -n $branch ]]; then
-    pass "Current branch: $branch"
+    warn "No xdg terminal preference file found"
   fi
 
-  if [[ -n $(git -C "$LEENIUM_PATH" status --short 2>/dev/null) ]]; then
-    warn "Leenium git tree has uncommitted changes"
+  default_browser=$(xdg-settings get default-web-browser 2>/dev/null || true)
+  if [[ -n $default_browser ]]; then
+    default_browser_file=$(find_desktop_entry_file "$default_browser" || true)
+    if [[ -n $default_browser_file ]]; then
+      check_desktop_entry "$default_browser_file" "Default browser"
+    else
+      fail "Default browser desktop entry missing ($default_browser)"
+    fi
   else
-    pass "Leenium git tree is clean"
+    warn "No default browser is configured"
   fi
-else
-  warn "Leenium root is not a git repository"
+
+  editor_binary=${EDITOR:-nvim}
+  if leenium-cmd-present "$editor_binary"; then
+    pass "Editor available ($editor_binary)"
+  else
+    warn "Editor command missing ($editor_binary)"
+  fi
+
+  if [[ -f $HOME/.config/voxtype/config.toml ]]; then
+    if leenium-cmd-present voxtype wtype; then
+      pass "Voxtype integration dependencies available"
+    else
+      fail "Voxtype is configured but required commands are missing"
+    fi
+  fi
+
+  if leenium-cmd-present tailscale; then
+    pass "Tailscale installed"
+    check_system_service_if_installed tailscale tailscaled.service "Tailscale"
+
+    if [[ -f $HOME/.local/share/applications/Tailscale.desktop ]]; then
+      check_desktop_entry "$HOME/.local/share/applications/Tailscale.desktop" "Tailscale web app"
+    fi
+  fi
+
+  if leenium-cmd-present docker; then
+    pass "Docker installed"
+
+    if docker ps >/dev/null 2>&1; then
+      pass "Docker daemon reachable"
+    else
+      docker_service_state=""
+      docker_socket_state=""
+
+      if system_unit_exists docker.service; then
+        docker_service_state=$(systemctl is-enabled docker.service 2>/dev/null || true)
+      fi
+
+      if system_unit_exists docker.socket; then
+        docker_socket_state=$(systemctl is-enabled docker.socket 2>/dev/null || true)
+      fi
+
+      if [[ $docker_service_state == "enabled" ]] || [[ $docker_socket_state == "enabled" ]]; then
+        warn "Docker is installed but the daemon is not reachable for the current user"
+      elif [[ -n $docker_service_state ]] || [[ -n $docker_socket_state ]]; then
+        warn "Docker is installed but neither docker.service nor docker.socket is enabled"
+      else
+        warn "Docker installed but no docker systemd unit was found"
+      fi
+    fi
+  fi
+
+  steam_desktop_file=$(find_desktop_entry_file steam.desktop || true)
+  if [[ -n $steam_desktop_file ]]; then
+    check_desktop_entry "$steam_desktop_file" "Steam"
+  elif leenium-cmd-present steam; then
+    pass "Steam command available"
+  fi
+
+  lutris_desktop_file=$(find_desktop_entry_file net.lutris.Lutris.desktop || true)
+  if [[ -n $lutris_desktop_file ]]; then
+    check_desktop_entry "$lutris_desktop_file" "Lutris"
+  elif leenium-cmd-present lutris; then
+    pass "Lutris command available"
+  fi
+
+  gfn_desktop_file=$(find_desktop_entry_file com.nvidia.geforcenow.desktop || true)
+  if [[ -z $gfn_desktop_file ]]; then
+    gfn_desktop_file=$(find_desktop_entry_file GeForceNOW.desktop || true)
+  fi
+
+  if [[ -n $gfn_desktop_file ]]; then
+    check_desktop_entry "$gfn_desktop_file" "GeForce NOW"
+  fi
+
+  local_app_count=0
+  broken_local_apps=0
+  while IFS= read -r desktop_file; do
+    [[ -n $desktop_file ]] || continue
+    app_name=$(basename "$desktop_file")
+    exec_line=$(desktop_exec_line "$desktop_file")
+    icon_line=$(sed -n 's/^Icon=//p' "$desktop_file" 2>/dev/null | head -1)
+
+    if [[ $exec_line != leenium-* ]] && [[ $exec_line != xdg-terminal-exec* ]] && [[ $icon_line != $HOME/.local/share/applications/icons/* ]]; then
+      continue
+    fi
+
+    ((local_app_count++))
+    exec_binary=$(desktop_exec_binary "$desktop_file")
+
+    if [[ -z $exec_binary ]]; then
+      warn "Local app $app_name has no readable Exec line"
+      ((broken_local_apps++))
+      continue
+    fi
+
+    if [[ $exec_binary == "leenium-launch-webapp" || $exec_binary == "xdg-terminal-exec" || $exec_binary == "gtk-launch" || $exec_binary == "uwsm-app" ]]; then
+      pass "Local app $app_name has a recognized launcher"
+    elif leenium-cmd-present "$exec_binary"; then
+      pass "Local app $app_name command available ($exec_binary)"
+    else
+      warn "Local app $app_name command missing ($exec_binary)"
+      ((broken_local_apps++))
+    fi
+
+    if [[ -n $icon_line && $icon_line == /* && ! -f $icon_line ]]; then
+      warn "Local app $app_name icon missing ($icon_line)"
+      ((broken_local_apps++))
+    fi
+  done < <(find "$HOME/.local/share/applications" -maxdepth 1 -type f -name '*.desktop' 2>/dev/null | sort)
+
+  if (( local_app_count == 0 )); then
+    pass "No local application launchers to validate"
+  elif (( broken_local_apps == 0 )); then
+    pass "All local application launchers look valid"
+  fi
+}
+
+section_rollback() {
+  section "Rollback"
+  history_file="$STATE_DIR/update-history.tsv"
+
+  if [[ -f $history_file ]]; then
+    pass "Update history file present ($history_file)"
+
+    history_columns=$(awk -F'\t' 'NF > max { max = NF } END { print max + 0 }' "$history_file")
+    if (( history_columns >= 12 )); then
+      pass "Update history format includes snapshot IDs"
+    elif (( history_columns >= 11 )); then
+      warn "Update history exists but uses the older format without snapshot IDs"
+    else
+      warn "Update history file format looks incomplete"
+    fi
+  else
+    warn "No update history file found yet"
+  fi
+
+  if leenium-update-history --json >/dev/null 2>&1; then
+    pass "Update history JSON output works"
+  else
+    fail "Update history JSON output failed"
+  fi
+
+  if leenium-cmd-present snapper; then
+    pass "Snapper available for rollback"
+
+    if leenium-cmd-present limine-snapper-restore; then
+      pass "limine-snapper-restore available"
+    else
+      warn "limine-snapper-restore missing"
+    fi
+
+    if sudo snapper --csvout --no-headers list-configs >/dev/null 2>&1; then
+      pass "Snapper configs are readable"
+    else
+      warn "Snapper is installed but configs could not be read"
+    fi
+
+    if sudo snapper -c root --csvout --no-headers list --columns number >/dev/null 2>&1; then
+      pass "Root snapshots are listable"
+    else
+      warn "Snapper root snapshots could not be listed"
+    fi
+  else
+    warn "Snapper not installed, rollback is unavailable"
+  fi
+}
+
+section_theme() {
+  section "Theme"
+  missing_theme_assets=0
+
+  while IFS= read -r theme_dir; do
+    [[ -n $theme_dir ]] || continue
+
+    if [[ ! -f $theme_dir/colors.toml ]]; then
+      fail "Theme $(basename "$theme_dir") is missing colors.toml"
+      ((missing_theme_assets++))
+    fi
+
+    if [[ ! -f $theme_dir/preview.png ]]; then
+      warn "Theme $(basename "$theme_dir") is missing preview.png"
+    fi
+  done < <(find "$LEENIUM_PATH/themes" -mindepth 1 -maxdepth 1 -type d | sort)
+
+  if (( missing_theme_assets == 0 )); then
+    pass "All built-in themes include colors.toml"
+  fi
+
+  current_theme_name=""
+  if [[ -f $USER_LEENIUM_DIR/current/theme.name ]]; then
+    current_theme_name=$(<"$USER_LEENIUM_DIR/current/theme.name")
+  fi
+
+  if [[ -n $current_theme_name ]]; then
+    if [[ -d $USER_LEENIUM_DIR/current/theme ]]; then
+      pass "Active theme directory exists"
+    else
+      fail "Active theme directory missing ($USER_LEENIUM_DIR/current/theme)"
+    fi
+
+    if [[ -d $LEENIUM_PATH/themes/$current_theme_name ]] || [[ -d $USER_LEENIUM_DIR/themes/$current_theme_name ]]; then
+      pass "Active theme source exists ($current_theme_name)"
+    else
+      fail "Active theme source missing ($current_theme_name)"
+    fi
+
+    if [[ -f $USER_LEENIUM_DIR/current/theme/colors.toml ]]; then
+      pass "Active theme colors.toml present"
+    else
+      warn "Active theme colors.toml missing"
+    fi
+  else
+    warn "No active theme is recorded"
+  fi
+
+  template_count=$(find "$LEENIUM_PATH/default/themed" -maxdepth 1 -type f -name '*.tpl' | wc -l)
+  if (( template_count > 0 )); then
+    pass "Theme templates present ($template_count files)"
+  else
+    fail "No theme templates found in $LEENIUM_PATH/default/themed"
+  fi
+}
+
+section_migrations() {
+  section "Migrations"
+  migration_total=$(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | wc -l)
+  pending_migrations=0
+  current_version=""
+  previous_version="1.0.0"
+  version_state_file="$STATE_DIR/version"
+
+  version_lt() {
+    [[ $1 != "$2" ]] && [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+  }
+
+  version_le() {
+    [[ $1 == "$2" ]] || [[ $(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1) == "$1" ]]
+  }
+
+  if [[ -f $LEENIUM_PATH/version ]]; then
+    current_version=$(<"$LEENIUM_PATH/version")
+  fi
+
+  if [[ -f $version_state_file ]]; then
+    previous_version=$(<"$version_state_file")
+  fi
+
+  while IFS= read -r migration_file; do
+    [[ -n $migration_file ]] || continue
+
+    migration_name=$(basename "$migration_file")
+    migration_version=$(sed -n 's/^MIGRATION_VERSION="\([^"]*\)"$/\1/p' "$migration_file" | head -n1)
+
+    if [[ -n $current_version && -n $migration_version ]] && (! version_lt "$previous_version" "$migration_version" || ! version_le "$migration_version" "$current_version"); then
+      continue
+    fi
+
+    if [[ ! -f $MIGRATIONS_STATE_DIR/$migration_name && ! -f $MIGRATIONS_STATE_DIR/skipped/$migration_name ]]; then
+      ((pending_migrations++))
+    fi
+  done < <(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | sort)
+
+  if (( migration_total == 0 )); then
+    pass "No migrations are currently shipped"
+  elif (( pending_migrations == 0 )); then
+    pass "No pending migrations"
+  else
+    warn "$pending_migrations migration(s) are pending"
+  fi
+}
+
+section_services() {
+  section "Services"
+  if systemctl --user show-environment >/dev/null 2>&1; then
+    failed_units=$(systemctl --user --failed --no-legend --plain 2>/dev/null | sed '/^[[:space:]]*$/d')
+
+    if [[ -n $failed_units ]]; then
+      warn "User services have failed units"
+      echo "$failed_units"
+    else
+      pass "No failed user services"
+    fi
+
+    if systemctl --user list-unit-files | grep -q '^leenium-battery-monitor.timer'; then
+      battery_monitor_state=$(systemctl --user is-enabled leenium-battery-monitor.timer 2>/dev/null || true)
+
+      if [[ $battery_monitor_state == "enabled" ]]; then
+        pass "leenium-battery-monitor.timer is enabled"
+      else
+        warn "leenium-battery-monitor.timer is not enabled"
+      fi
+    else
+      warn "leenium-battery-monitor.timer is not installed for this user"
+    fi
+  else
+    warn "systemctl --user is not available in this session"
+  fi
+}
+
+section_git() {
+  section "Git"
+  if git -C "$LEENIUM_PATH" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    pass "Leenium root is a git repository"
+
+    branch=$(git -C "$LEENIUM_PATH" branch --show-current 2>/dev/null || true)
+    if [[ -n $branch ]]; then
+      pass "Current branch: $branch"
+    fi
+
+    if [[ -n $(git -C "$LEENIUM_PATH" status --short 2>/dev/null) ]]; then
+      warn "Leenium git tree has uncommitted changes"
+    else
+      pass "Leenium git tree is clean"
+    fi
+  else
+    warn "Leenium root is not a git repository"
+  fi
+}
+
+section_scripts() {
+  section "Scripts"
+
+  if [[ "$QUICK_MODE" == "true" ]]; then
+    pass "Scripts check skipped (--quick mode)"
+    return
+  fi
+
+  script_count=0
+  syntax_errors=0
+  permission_errors=0
+  trailing_whitespace=0
+
+  while IFS= read -r script; do
+    [[ -n $script ]] || continue
+    ((script_count++))
+
+    first_line=$(head -1 "$script")
+    shebang_ok=false
+    if [[ "$first_line" =~ ^#!/(bin/bash|usr/bin/env bash) ]]; then
+      shebang_ok=true
+      if ! bash -n "$script" 2>/dev/null; then
+        fail "$(basename "$script"): syntax error"
+        ((syntax_errors++))
+      fi
+    elif [[ "$first_line" =~ ^#!/(bin/python|usr/bin/env python) ]]; then
+      shebang_ok=true
+      if command -v python3 >/dev/null 2>&1 && ! python3 -m py_compile "$script" 2>/dev/null; then
+        fail "$(basename "$script"): syntax error"
+        ((syntax_errors++))
+      fi
+    fi
+
+    if ! $shebang_ok; then
+      warn "$(basename "$script"): missing or invalid shebang"
+    fi
+
+    if [[ ! -x "$script" ]]; then
+      warn "$(basename "$script"): not executable"
+      ((permission_errors++))
+    fi
+
+    if grep -q '[[:space:]]$' "$script" 2>/dev/null; then
+      warn "$(basename "$script"): contains trailing whitespace"
+      ((trailing_whitespace++))
+    fi
+  done < <(find "$LEENIUM_PATH/bin" -maxdepth 1 -type f -name 'leenium-*' 2>/dev/null | sort)
+
+  if (( script_count > 0 )); then
+    if (( syntax_errors == 0 )); then
+      pass "All $script_count scripts have valid syntax"
+    fi
+    if (( permission_errors == 0 )); then
+      pass "All scripts have correct permissions"
+    fi
+  else
+    warn "No leenium scripts found in $LEENIUM_PATH/bin"
+  fi
+}
+
+section_hooks() {
+  section "Hooks"
+  hooks_dir="$HOME/.config/leenium/hooks"
+
+  if [[ ! -d $hooks_dir ]]; then
+    pass "No custom hooks directory (optional)"
+    return
+  fi
+
+  hook_count=0
+  hook_errors=0
+
+  while IFS= read -r hook; do
+    [[ -n $hook ]] || continue
+
+    if [[ "$hook" == *.sample ]]; then
+      continue
+    fi
+
+    ((hook_count++))
+
+    if [[ ! -x "$hook" ]]; then
+      warn "$(basename "$hook"): hook not executable"
+      ((hook_errors++))
+    fi
+
+    if ! bash -n "$hook" 2>/dev/null; then
+      fail "$(basename "$hook"): hook has syntax error"
+      ((hook_errors++))
+    fi
+  done < <(find "$hooks_dir" -maxdepth 1 -type f 2>/dev/null | sort)
+
+  if (( hook_count > 0 )); then
+    if (( hook_errors == 0 )); then
+      pass "All $hook_count hooks are valid"
+    fi
+  fi
+}
+
+section_variables() {
+  section "Variable Safety"
+
+  suspicious_count=0
+
+  while IFS= read -r script; do
+    [[ -n $script ]] || continue
+
+    while IFS= read -r line; do
+      if [[ "$line" =~ (cat|cp|mv|rm|grep|ls|mkdir|chmod|chown|curl|wget|sudo)\  ]]; then
+        warn "$(basename "$script"): potential unquoted variable in command: ${line:0:60}..."
+        ((suspicious_count++))
+      fi
+    done < <(grep -nE '^\s*(cat|cp|mv|rm|grep|ls|mkdir|chmod|chown|curl|wget|sudo)\s+[^"]*\$[A-Za-z_]' "$script" 2>/dev/null || true)
+  done < <(find "$LEENIUM_PATH/bin" -maxdepth 1 -type f -name 'leenium-*' 2>/dev/null | sort)
+
+  if (( suspicious_count == 0 )); then
+    pass "No obvious unquoted variable issues detected"
+  fi
+}
+
+section_dependencies() {
+  section "Dependencies"
+
+  required_deps=(
+    "sudo:0:Sudo"
+    "systemctl:1:Systemctl"
+    "pacman:0:Pacman"
+    "git:0:Git"
+    "gum:0:Gum"
+    "hyprctl:0:Hyprctl"
+    "waybar:0:Waybar"
+    "walker:0:Walker"
+    "uwsm:0:UWSM"
+    "snapper:0:Snapper"
+    "limine-update:0:Limine"
+  )
+
+  missing_count=0
+
+  for dep in "${required_deps[@]}"; do
+    IFS=':' read -r cmd critical label <<< "$dep"
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      if (( critical )); then
+        fail "$label not found ($cmd)"
+        ((missing_count++))
+      else
+        warn "$label not found ($cmd)"
+      fi
+    else
+      pass "$label available"
+    fi
+  done
+
+  if (( missing_count == 0 )); then
+    pass "All required dependencies are installed"
+  fi
+}
+
+section_desktop() {
+  section "Desktop Entries"
+
+  while IFS= read -r desktop_file; do
+    [[ -n $desktop_file ]] || continue
+
+    if [[ -f "$desktop_file" ]]; then
+      icon_line=$(sed -n 's/^Icon=//p' "$desktop_file" 2>/dev/null | head -1)
+      exec_line=$(sed -n 's/^Exec=//p' "$desktop_file" 2>/dev/null | head -1)
+
+      if [[ -n $icon_line && $icon_line == /* && ! -f "$icon_line" ]]; then
+        warn "$(basename "$desktop_file"): icon not found ($icon_line)"
+      fi
+
+      mime_type=$(sed -n 's/^MimeType=//p' "$desktop_file" 2>/dev/null | head -1)
+      if [[ -n $mime_type ]]; then
+        IFS=';' read -ra mimes <<< "$mime_type"
+        for mime in "${mimes[@]}"; do
+          [[ -n $mime ]] || continue
+          if ! xdg-mime query default "$(file -b --mime-type "${desktop_file%/*}/.." 2>/dev/null)" "$mime" >/dev/null 2>&1; then
+            warn "$(basename "$desktop_file"): mime type $mime may not be registered"
+          fi
+        done
+      fi
+    fi
+  done < <(find "$HOME/.local/share/applications" -maxdepth 1 -type f -name '*.desktop' 2>/dev/null | sort)
+
+  pass "Desktop entry validation complete"
+}
+
+section_network() {
+  section "Network"
+
+  if command -v curl >/dev/null 2>&1; then
+    if curl -s --connect-timeout 5 --max-time 10 -I "https://pkgs.omarchy.org/" >/dev/null 2>&1; then
+      pass "Package server (pkgs.omarchy.org) is reachable"
+    else
+      warn "Package server (pkgs.omarchy.org) is not reachable"
+    fi
+  else
+    warn "curl not available, skipping network check"
+  fi
+
+  if command -v host >/dev/null 2>&1; then
+    if host "omarchy.org" >/dev/null 2>&1; then
+      pass "DNS resolution for omarchy.org works"
+    else
+      warn "DNS resolution for omarchy.org failed"
+    fi
+  fi
+}
+
+section_disk() {
+  section "Disk Space"
+
+  check_mount_space() {
+    local mount="$1"
+    local label="$2"
+    local min_mb="$3"
+
+    local avail_kb=$(df -k "$mount" | awk 'NR==2 {print $4}')
+    local avail_mb=$((avail_kb / 1024))
+
+    if (( avail_mb < min_mb )); then
+      warn "$label has only ${avail_mb}MB free (recommended: ${min_mb}MB)"
+    else
+      pass "$label has ${avail_mb}MB free"
+    fi
+  }
+
+  check_mount_space "/" "Root filesystem" 1000
+  check_mount_space "/boot" "Boot partition" 100
+
+  usage_percent=$(df / | awk 'NR==2 {print $5}' | tr -d '%')
+  if (( usage_percent > 90 )); then
+    warn "Root filesystem is ${usage_percent}% full"
+  fi
+}
+
+section_permissions() {
+  section "Permissions"
+
+  check_ownership() {
+    local path="$1"
+    local label="$2"
+
+    if [[ ! -e "$path" ]]; then
+      warn "$label does not exist ($path)"
+      return
+    fi
+
+    local owner=$(stat -c '%U' "$path" 2>/dev/null)
+    local current_user=$(whoami)
+
+    if [[ "$owner" == "$current_user" ]]; then
+      pass "$label is owned by user"
+    else
+      warn "$label is owned by $owner (should be $current_user)"
+    fi
+  }
+
+  check_ownership "$LEENIUM_PATH" "Leenium installation"
+  check_ownership "$HOME/.config/leenium" "User leenium config"
+  check_ownership "$HOME/.local/state/leenium" "Leenium state directory"
+
+  if [[ -d "$HOME/.local/state/leenium" ]]; then
+    pass "Leenium state directory exists"
+  fi
+}
+
+if [[ -z $TARGET_SECTION ]]; then
+  section_install
+  section_commands
+  section_config
+  section_apps
+  section_rollback
+  section_theme
+  section_migrations
+  section_services
+  section_git
 fi
+
+section_scripts
+section_hooks
+section_variables
+section_dependencies
+section_desktop
+section_network
+section_disk
+section_permissions
 
 section "Summary"
-echo "Passed:   $PASS_COUNT"
-echo "Warnings: $WARN_COUNT"
-echo "Failed:   $FAIL_COUNT"
+if [[ "$JSON_OUTPUT" != "true" ]]; then
+  echo
+  echo -e "  \e[32m✓  Passed   $PASS_COUNT"
+  echo -e "  \e[33m⚠  Warnings $WARN_COUNT"
+  if (( FAIL_COUNT > 0 )); then
+    echo -e "  \e[31m✗  Failed   $FAIL_COUNT"
+  else
+    echo -e "  \e[32m✗  Failed   $FAIL_COUNT"
+  fi
+  echo
+
+  if (( FAIL_COUNT == 0 )) && (( WARN_COUNT == 0 )); then
+    echo -e "  \e[32m✓ All checks passed!\e[0m"
+  elif (( FAIL_COUNT == 0 )); then
+    echo -e "  \e[33m⚠ Some warnings detected (non-blocking)\e[0m"
+  else
+    echo -e "  \e[31m✗ Fix the issues above before continuing\e[0m"
+  fi
+else
+  echo "{\"total\":{\"pass\":$PASS_COUNT,\"warn\":$WARN_COUNT,\"fail\":$FAIL_COUNT}}"
+fi
 
 if (( FAIL_COUNT > 0 )); then
   exit 1
