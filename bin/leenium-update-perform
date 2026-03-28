@@ -23,4 +23,4 @@ leenium-update-analyze-logs
 leenium-update-restart
 
 # Re-enable screensaver/sleep after updates
-hyprctl dispatch tagwindow -- -noidle &>/dev/null || true
+hyprctl dispatch tagwindow -noidle &>/dev/null || true

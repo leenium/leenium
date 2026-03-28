@@ -9,5 +9,5 @@ if pgrep -x kitty >/dev/null; then
 fi
 
 if pgrep -x ghostty >/dev/null; then
-  killall -SIGUSR2 ghostty
+  killall -SIGUSR2 ghostty >/dev/null
 fi

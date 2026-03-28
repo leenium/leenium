@@ -2,9 +2,10 @@
 
 # Overwrite the user config for the Limine bootloader and rebuild it.
 
-if [[ -f /boot/EFI/Linux/leenium_linux.efi ]] && [[ -f /boot/EFI/Linux/$(cat /etc/machine-id)_linux.efi ]]; then
+MACHINE_ID=$(cat /etc/machine-id 2>/dev/null || true)
+if [[ -n $MACHINE_ID ]] && [[ -f /boot/EFI/Linux/leenium_linux.efi ]] && [[ -f "/boot/EFI/Linux/${MACHINE_ID}_linux.efi" ]]; then
   echo "Cleanup extra UKI"
-  sudo rm -f /boot/EFI/Linux/$(cat /etc/machine-id)_linux.efi
+  sudo rm -f "/boot/EFI/Linux/${MACHINE_ID}_linux.efi"
 fi
 echo "Resetting limine config"
 

@@ -40,17 +40,8 @@ else
   APP_CLASS="TUI.tile"
 fi
 
-cat >"$DESKTOP_FILE" <<EOF
-[Desktop Entry]
-Version=1.0
-Name=$APP_NAME
-Comment=$APP_NAME
-Exec=xdg-terminal-exec --app-id=$APP_CLASS -e $APP_EXEC
-Terminal=false
-Type=Application
-Icon=$ICON_PATH
-StartupNotify=true
-EOF
+printf '[Desktop Entry]\nVersion=1.0\nName=%s\nComment=%s\nExec=xdg-terminal-exec --app-id=%s -e %s\nTerminal=false\nType=Application\nIcon=%s\nStartupNotify=true\n' \
+  "$APP_NAME" "$APP_NAME" "$APP_CLASS" "$APP_EXEC" "$ICON_PATH" >"$DESKTOP_FILE"
 
 chmod +x "$DESKTOP_FILE"
 

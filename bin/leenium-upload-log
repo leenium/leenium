@@ -44,7 +44,7 @@ install)
 
   # Combine system info with logs
   cat "$SYSTEM_INFO" >"$TEMP_LOG"
-  cat $ARCHINSTALL_LOG $LEENIUM_LOG >>"$TEMP_LOG" 2>/dev/null
+  cat "$ARCHINSTALL_LOG" "$LEENIUM_LOG" >>"$TEMP_LOG" 2>/dev/null
 
   if [[ ! -s $TEMP_LOG ]]; then
     echo "Error: No install logs found"
@@ -112,8 +112,9 @@ esac
 echo ""
 
 URL=$(curl -sF "file=@$TEMP_LOG" -Fexpires=24 https://0x0.st)
+curl_exit=$?
 
-if (( $? == 0 )) && [[ -n $URL ]]; then
+if (( curl_exit == 0 )) && [[ -n $URL ]]; then
   echo "✓ Log uploaded successfully!"
   echo "Share this URL:"
   echo ""
