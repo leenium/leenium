@@ -478,7 +478,7 @@ show_install_service_menu() {
 show_install_editor_menu() {
   case $(menu "Install" "  VSCode\n  Cursor\n  Zed\n  Helix\n  Emacs") in
   *VSCode*) present_terminal leenium-install-vscode ;;
-  *Cursor*) install_and_launch "Cursor" "cursor-bin" "cursor" ;;
+  *Cursor*) aur_install_and_launch "Cursor" "cursor-bin" "cursor" ;;
   *Zed*) install_and_launch "Zed" "zed" "dev.zed.Zed" ;;
   *Helix*) install "Helix" "helix" ;;
   *Emacs*) install "Emacs" "emacs-wayland" && systemctl --user enable --now emacs.service ;;
@@ -505,15 +505,14 @@ show_install_ai_menu() {
   case $(menu "Install" "󱚤  Claude Code\n󱚤  Codex\n󱚤  Crush\n  Dictation\n󱚤  Gemini CLI\n󱚤  Ollama\n󱚤  OpenCode\n󱚤  LM Studio (AUR)") in
   *Claude*) present_terminal "leenium-install-dev-env claude-code" ;;
   *Codex*) present_terminal "leenium-install-dev-env codex" ;;
-  *Crush*) install "Crush" "crush-bin" ;;
+  *Crush*) present_terminal "leenium-install-dev-env crush" ;;
   *Dictation*) present_terminal leenium-voxtype-install ;;
   *Gemini*) present_terminal "leenium-install-dev-env gemini-cli" ;;
   *Ollama*) install "Ollama" $ollama_pkg ;;
   *OpenCode*) present_terminal "leenium-install-dev-env opencode" ;;
-  *Studio*) present_terminal "leenium-pkg-add lmstudio-bin" ;;
+  *Studio*) present_terminal "leenium-pkg-aur-add lmstudio-bin" ;;
   *) show_install_menu ;;
   esac
-  
 }
 
 show_install_gaming_menu() {
@@ -650,7 +649,7 @@ show_remove_ai_menu() {
   case $(menu "Remove" "󱚤  Claude Code\n󱚤  Codex\n󱚤  Crush\n  Dictation\n󱚤  Gemini CLI\n󱚤  Ollama\n󱚤  OpenCode\n󱚤  LM Studio") in
   *Claude*) present_terminal "leenium-remove-dev-env claude-code" ;;
   *Codex*) present_terminal "leenium-remove-dev-env codex" ;;
-  *Crush*) present_terminal "leenium-pkg-drop crush-bin" ;;
+  *Crush*) present_terminal "leenium-remove-dev-env crush" ;;
   *Dictation*) present_terminal leenium-voxtype-remove ;;
   *Gemini*) present_terminal "leenium-remove-dev-env gemini-cli" ;;
   *Ollama*) present_terminal "leenium-pkg-drop ollama-cuda ollama-rocm ollama" ;;

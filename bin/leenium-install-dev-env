@@ -134,6 +134,26 @@ ocaml)
   eval "$(opam env)"
   opam install ocaml-lsp-server odoc ocamlformat utop --yes
   ;;
+claude-code)
+  echo -e "Installing Claude Code...\n"
+  mise use --global claude-code@latest
+  ;;
+codex)
+  echo -e "Installing Codex...\n"
+  mise use --global codex@latest
+  ;;
+crush)
+  echo -e "Installing Crush...\n"
+  mise use --global crush@latest
+  ;;
+gemini-cli)
+  echo -e "Installing Gemini...\n"
+  mise use --global gemini-cli@latest
+  ;;
+opencode)
+  echo -e "Installing OpenCode...\n"
+  mise use --global opencode@latest
+  ;;
 dotnet)
   echo -e "Installing .NET...\n"
   mise use --global dotnet@latest
