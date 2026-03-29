@@ -16,6 +16,81 @@ QUICK_MODE=false
 JSON_OUTPUT=false
 TARGET_SECTION=""
 SECTION_RESULTS="{}"
+LIVE_OUTPUT=false
+SPINNER_ACTIVE=false
+SPINNER_INDEX=0
+CURRENT_SECTION=""
+SPINNER_FRAMES=('⠋ ' '⠙ ' '⠹ ' '⠼ ' '⠶ ' '⠧ ' '⠏ ')
+
+repeat_char() {
+  local char="$1"
+  local count="$2"
+  local out=""
+
+  while (( count > 0 )); do
+    out+="$char"
+    ((count--))
+  done
+
+  printf '%s' "$out"
+}
+
+ui_width() {
+  local width=72
+
+  if command -v tput >/dev/null 2>&1; then
+    width=$(tput cols 2>/dev/null || echo 72)
+  fi
+
+  if [[ ! $width =~ ^[0-9]+$ ]]; then
+    width=72
+  fi
+
+  if (( width < 48 )); then
+    width=48
+  elif (( width > 96 )); then
+    width=96
+  fi
+
+  echo "$width"
+}
+
+print_section_header() {
+  local title="$1"
+  local width
+  local line
+
+  width=$(ui_width)
+  line=$(repeat_char "─" "$width")
+
+  echo
+  echo -e "\e[2;37m$line\e[0m"
+  echo -e "\e[1;36m  $title\e[0m"
+}
+
+print_summary_line() {
+  local icon="$1"
+  local color="$2"
+  local label="$3"
+  local value="$4"
+
+  echo -e "  \e[${color}m${icon}\e[0m  ${label} ${value}"
+}
+
+print_result_line() {
+  local icon="$1"
+  local color="$2"
+  local status="$3"
+  local message="$4"
+
+  printf '\e[%sm%-2s %-5s\e[0m %s\n' "$color" "$icon" "$status" "$message"
+}
+
+python_syntax_ok() {
+  local script="$1"
+
+  python3 -c 'import pathlib, sys; compile(pathlib.Path(sys.argv[1]).read_text(), sys.argv[1], "exec")' "$script" >/dev/null 2>&1
+}
 
 print_usage() {
   cat <<EOF
@@ -62,6 +137,66 @@ while (( $# > 0 )); do
   shift
 done
 
+if [[ "$JSON_OUTPUT" != "true" && -t 1 ]]; then
+  LIVE_OUTPUT=true
+fi
+
+clear_live_line() {
+  [[ "$LIVE_OUTPUT" == "true" ]] || return 0
+
+  if [[ "$SPINNER_ACTIVE" == "true" ]]; then
+    printf '\r\033[2K'
+    SPINNER_ACTIVE=false
+  fi
+}
+
+render_spinner_frame() {
+  local message="$1"
+
+  [[ "$LIVE_OUTPUT" == "true" ]] || return 0
+
+  printf '\r\033[2K\e[36m%s\e[0m %s' "${SPINNER_FRAMES[SPINNER_INDEX]}" "$message"
+  SPINNER_ACTIVE=true
+}
+
+advance_spinner_frame() {
+  SPINNER_INDEX=$(( (SPINNER_INDEX + 1) % ${#SPINNER_FRAMES[@]} ))
+}
+
+with_spinner() {
+  local message="$1"
+  shift
+  local cmd_pid
+  local status
+
+  if [[ "$LIVE_OUTPUT" != "true" ]]; then
+    "$@"
+    return $?
+  fi
+
+  "$@" &
+  cmd_pid=$!
+
+  while kill -0 "$cmd_pid" >/dev/null 2>&1; do
+    render_spinner_frame "$message"
+    sleep 0.1
+    advance_spinner_frame
+  done
+
+  wait "$cmd_pid"
+  status=$?
+  clear_live_line
+  return $status
+}
+
+announce_check() {
+  local message="$1"
+
+  [[ "$LIVE_OUTPUT" == "true" ]] || return 0
+  render_spinner_frame "$message"
+  advance_spinner_frame
+}
+
 run_section() {
   local section_name="$1"
   local section_func="$2"
@@ -80,7 +215,8 @@ pass() {
   if [[ "$JSON_OUTPUT" == "true" ]]; then
     echo "{\"status\":\"pass\",\"message\":\"$msg\"}"
   else
-    echo -e "\e[32mPASS\e[0m $1"
+    clear_live_line
+    print_result_line "✓" "32" "PASS" "$1"
   fi
   ((PASS_COUNT++))
 }
@@ -90,7 +226,8 @@ warn() {
   if [[ "$JSON_OUTPUT" == "true" ]]; then
     echo "{\"status\":\"warn\",\"message\":\"$msg\"}"
   else
-    echo -e "\e[33mWARN\e[0m $1"
+    clear_live_line
+    print_result_line "!" "33" "WARN" "$1"
   fi
   ((WARN_COUNT++))
 }
@@ -100,16 +237,18 @@ fail() {
   if [[ "$JSON_OUTPUT" == "true" ]]; then
     echo "{\"status\":\"fail\",\"message\":\"$msg\"}"
   else
-    echo -e "\e[31mFAIL\e[0m $1"
+    clear_live_line
+    print_result_line "✗" "31" "FAIL" "$1"
   fi
   ((FAIL_COUNT++))
 }
 
 section() {
   if [[ "$JSON_OUTPUT" != "true" ]]; then
-    echo
-    echo -e "\e[1m$1\e[0m"
+    clear_live_line
+    print_section_header "$1"
   fi
+  CURRENT_SECTION="$1"
 }
 
 desktop_exec_binary() {
@@ -142,6 +281,7 @@ check_desktop_entry() {
   local icon_path
   local exec_binary
 
+  announce_check "Checking $label desktop entry"
   if [[ ! -f $desktop_file ]]; then
     fail "$label desktop entry missing ($desktop_file)"
     return
@@ -191,7 +331,9 @@ check_system_service_if_installed() {
   local label="$3"
   local state
 
+  announce_check "Checking $label service"
   if ! leenium-cmd-present "$cmd"; then
+    clear_live_line
     return
   fi
 
@@ -221,7 +363,7 @@ check_dir() {
   local path="$1"
   local label="$2"
 
-  if [[ -d $path ]]; then
+  if with_spinner "Checking $label" test -d "$path"; then
     pass "$label present ($path)"
   else
     fail "$label missing ($path)"
@@ -232,7 +374,7 @@ check_file() {
   local path="$1"
   local label="$2"
 
-  if [[ -f $path ]]; then
+  if with_spinner "Checking $label" test -f "$path"; then
     pass "$label present ($path)"
   else
     fail "$label missing ($path)"
@@ -243,7 +385,7 @@ check_command() {
   local cmd="$1"
   local label="$2"
 
-  if leenium-cmd-present "$cmd"; then
+  if with_spinner "Checking $label" leenium-cmd-present "$cmd"; then
     pass "$label available ($cmd)"
   else
     fail "$label missing ($cmd)"
@@ -264,12 +406,14 @@ section_install() {
   check_dir "$LEENIUM_PATH/default" "Default payload directory"
   check_file "$LEENIUM_PATH/version" "Version file"
 
+  announce_check "Checking PATH integration"
   if [[ :$PATH: == *":$LEENIUM_PATH/bin:"* ]]; then
     pass "Leenium bin directory is on PATH"
   else
     warn "Leenium bin directory is not on PATH"
   fi
 
+  announce_check "Checking installed version"
   if [[ -f $LEENIUM_PATH/version ]]; then
     version=$(<"$LEENIUM_PATH/version")
     if [[ -n $version ]]; then
@@ -307,6 +451,7 @@ section_config() {
 
 section_apps() {
   section "Apps"
+  announce_check "Checking preferred terminal"
   if [[ -f $USER_CONFIG_DIR/xdg-terminals.list ]]; then
     terminal_desktop_id=$(sed -n '/^[^#[:space:]]/p' "$USER_CONFIG_DIR/xdg-terminals.list" | head -1)
 
@@ -324,6 +469,7 @@ section_apps() {
     warn "No xdg terminal preference file found"
   fi
 
+  announce_check "Checking default browser"
   default_browser=$(xdg-settings get default-web-browser 2>/dev/null || true)
   if [[ -n $default_browser ]]; then
     default_browser_file=$(find_desktop_entry_file "$default_browser" || true)
@@ -336,6 +482,7 @@ section_apps() {
     warn "No default browser is configured"
   fi
 
+  announce_check "Checking editor command"
   editor_binary=${EDITOR:-nvim}
   if leenium-cmd-present "$editor_binary"; then
     pass "Editor available ($editor_binary)"
@@ -343,6 +490,7 @@ section_apps() {
     warn "Editor command missing ($editor_binary)"
   fi
 
+  announce_check "Checking voxtype integration"
   if [[ -f $HOME/.config/voxtype/config.toml ]]; then
     if leenium-cmd-present voxtype wtype; then
       pass "Voxtype integration dependencies available"
@@ -351,6 +499,7 @@ section_apps() {
     fi
   fi
 
+  announce_check "Checking Tailscale"
   if leenium-cmd-present tailscale; then
     pass "Tailscale installed"
     check_system_service_if_installed tailscale tailscaled.service "Tailscale"
@@ -360,6 +509,7 @@ section_apps() {
     fi
   fi
 
+  announce_check "Checking Docker"
   if leenium-cmd-present docker; then
     pass "Docker installed"
 
@@ -412,6 +562,7 @@ section_apps() {
 
   local_app_count=0
   broken_local_apps=0
+  announce_check "Scanning local application launchers"
   while IFS= read -r desktop_file; do
     [[ -n $desktop_file ]] || continue
     app_name=$(basename "$desktop_file")
@@ -457,6 +608,7 @@ section_rollback() {
   section "Rollback"
   history_file="$STATE_DIR/update-history.tsv"
 
+  announce_check "Checking rollback history"
   if [[ -f $history_file ]]; then
     pass "Update history file present ($history_file)"
 
@@ -472,12 +624,14 @@ section_rollback() {
     warn "No update history file found yet"
   fi
 
+  announce_check "Checking update history command"
   if leenium-update-history --json >/dev/null 2>&1; then
     pass "Update history JSON output works"
   else
     fail "Update history JSON output failed"
   fi
 
+  announce_check "Checking Snapper rollback support"
   if leenium-cmd-present snapper; then
     pass "Snapper available for rollback"
 
@@ -507,6 +661,7 @@ section_theme() {
   section "Theme"
   missing_theme_assets=0
 
+  announce_check "Checking built-in themes"
   while IFS= read -r theme_dir; do
     [[ -n $theme_dir ]] || continue
 
@@ -524,6 +679,7 @@ section_theme() {
     pass "All built-in themes include colors.toml"
   fi
 
+  announce_check "Checking active theme"
   current_theme_name=""
   if [[ -f $USER_LEENIUM_DIR/current/theme.name ]]; then
     current_theme_name=$(<"$USER_LEENIUM_DIR/current/theme.name")
@@ -551,6 +707,7 @@ section_theme() {
     warn "No active theme is recorded"
   fi
 
+  announce_check "Checking theme templates"
   template_count=$(find "$LEENIUM_PATH/default/themed" -maxdepth 1 -type f -name '*.tpl' | wc -l)
   if (( template_count > 0 )); then
     pass "Theme templates present ($template_count files)"
@@ -561,6 +718,7 @@ section_theme() {
 
 section_migrations() {
   section "Migrations"
+  announce_check "Checking migrations"
   migration_total=$(find "$LEENIUM_PATH/migrations" -maxdepth 1 -type f -name '*.sh' 2>/dev/null | wc -l)
   pending_migrations=0
   current_version=""
@@ -609,6 +767,7 @@ section_migrations() {
 
 section_services() {
   section "Services"
+  announce_check "Checking user services"
   if systemctl --user show-environment >/dev/null 2>&1; then
     failed_units=$(systemctl --user --failed --no-legend --plain 2>/dev/null | sed '/^[[:space:]]*$/d')
 
@@ -637,6 +796,7 @@ section_services() {
 
 section_git() {
   section "Git"
+  announce_check "Checking git state"
   if git -C "$LEENIUM_PATH" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     pass "Leenium root is a git repository"
 
@@ -667,6 +827,7 @@ section_scripts() {
   syntax_errors=0
   permission_errors=0
   trailing_whitespace=0
+  announce_check "Scanning Leenium scripts"
 
   while IFS= read -r script; do
     [[ -n $script ]] || continue
@@ -680,9 +841,9 @@ section_scripts() {
         fail "$(basename "$script"): syntax error"
         ((syntax_errors++))
       fi
-    elif [[ "$first_line" =~ ^#!/(bin/python|usr/bin/env python) ]]; then
+    elif [[ "$first_line" =~ ^#!/(bin/python3?|usr/bin/env python3?) ]]; then
       shebang_ok=true
-      if command -v python3 >/dev/null 2>&1 && ! python3 -m py_compile "$script" 2>/dev/null; then
+      if command -v python3 >/dev/null 2>&1 && ! python_syntax_ok "$script"; then
         fail "$(basename "$script"): syntax error"
         ((syntax_errors++))
       fi
@@ -726,6 +887,7 @@ section_hooks() {
 
   hook_count=0
   hook_errors=0
+  announce_check "Scanning custom hooks"
 
   while IFS= read -r hook; do
     [[ -n $hook ]] || continue
@@ -757,10 +919,13 @@ section_hooks() {
 section_variables() {
   section "Variable Safety"
 
+  scanned_scripts=0
   suspicious_count=0
+  announce_check "Scanning scripts for unsafe variable usage"
 
   while IFS= read -r script; do
     [[ -n $script ]] || continue
+    ((scanned_scripts++))
 
     while IFS= read -r line; do
       if [[ "$line" =~ (cat|cp|mv|rm|grep|ls|mkdir|chmod|chown|curl|wget|sudo)\  ]]; then
@@ -771,7 +936,9 @@ section_variables() {
   done < <(find "$LEENIUM_PATH/bin" -maxdepth 1 -type f -name 'leenium-*' 2>/dev/null | sort)
 
   if (( suspicious_count == 0 )); then
-    pass "No obvious unquoted variable issues detected"
+    pass "No obvious unquoted variable issues detected across $scanned_scripts scripts"
+  else
+    warn "Found $suspicious_count potential unquoted variable issue(s) across $scanned_scripts scripts"
   fi
 }
 
@@ -796,6 +963,7 @@ section_dependencies() {
 
   for dep in "${required_deps[@]}"; do
     IFS=':' read -r cmd critical label <<< "$dep"
+    announce_check "Checking $label"
     if ! command -v "$cmd" >/dev/null 2>&1; then
       if (( critical )); then
         fail "$label not found ($cmd)"
@@ -815,9 +983,13 @@ section_dependencies() {
 
 section_desktop() {
   section "Desktop Entries"
+  desktop_count=0
+  desktop_issue_count=0
+  announce_check "Scanning desktop entries"
 
   while IFS= read -r desktop_file; do
     [[ -n $desktop_file ]] || continue
+    ((desktop_count++))
 
     if [[ -f "$desktop_file" ]]; then
       icon_line=$(sed -n 's/^Icon=//p' "$desktop_file" 2>/dev/null | head -1)
@@ -825,6 +997,7 @@ section_desktop() {
 
       if [[ -n $icon_line && $icon_line == /* && ! -f "$icon_line" ]]; then
         warn "$(basename "$desktop_file"): icon not found ($icon_line)"
+        ((desktop_issue_count++))
       fi
 
       mime_type=$(sed -n 's/^MimeType=//p' "$desktop_file" 2>/dev/null | head -1)
@@ -834,18 +1007,24 @@ section_desktop() {
           [[ -n $mime ]] || continue
           if ! xdg-mime query default "$(file -b --mime-type "${desktop_file%/*}/.." 2>/dev/null)" "$mime" >/dev/null 2>&1; then
             warn "$(basename "$desktop_file"): mime type $mime may not be registered"
+            ((desktop_issue_count++))
           fi
         done
       fi
     fi
   done < <(find "$HOME/.local/share/applications" -maxdepth 1 -type f -name '*.desktop' 2>/dev/null | sort)
 
-  pass "Desktop entry validation complete"
+  if (( desktop_issue_count == 0 )); then
+    pass "Desktop entry validation complete ($desktop_count files checked)"
+  else
+    warn "Desktop entry validation complete with $desktop_issue_count issue(s) across $desktop_count files"
+  fi
 }
 
 section_network() {
   section "Network"
 
+  announce_check "Checking package server"
   if command -v curl >/dev/null 2>&1; then
     if curl -s --connect-timeout 5 --max-time 10 -I "https://pkgs.omarchy.org/" >/dev/null 2>&1; then
       pass "Package server (pkgs.omarchy.org) is reachable"
@@ -856,6 +1035,7 @@ section_network() {
     warn "curl not available, skipping network check"
   fi
 
+  announce_check "Checking DNS resolution"
   if command -v host >/dev/null 2>&1; then
     if host "omarchy.org" >/dev/null 2>&1; then
       pass "DNS resolution for omarchy.org works"
@@ -886,6 +1066,7 @@ section_disk() {
   check_mount_space "/" "Root filesystem" 1000
   check_mount_space "/boot" "Boot partition" 100
 
+  announce_check "Checking root filesystem usage"
   usage_percent=$(df / | awk 'NR==2 {print $5}' | tr -d '%')
   if (( usage_percent > 90 )); then
     warn "Root filesystem is ${usage_percent}% full"
@@ -946,22 +1127,18 @@ section_permissions
 
 section "Summary"
 if [[ "$JSON_OUTPUT" != "true" ]]; then
-  echo
-  echo -e "  \e[32m✓  Passed   $PASS_COUNT"
-  echo -e "  \e[33m⚠  Warnings $WARN_COUNT"
-  if (( FAIL_COUNT > 0 )); then
-    echo -e "  \e[31m✗  Failed   $FAIL_COUNT"
-  else
-    echo -e "  \e[32m✗  Failed   $FAIL_COUNT"
-  fi
+  clear_live_line
+  print_summary_line "✓" "32" "Passed  " "$PASS_COUNT"
+  print_summary_line "!" "33" "Warnings" "$WARN_COUNT"
+  print_summary_line "✗" "31" "Failed  " "$FAIL_COUNT"
   echo
 
   if (( FAIL_COUNT == 0 )) && (( WARN_COUNT == 0 )); then
-    echo -e "  \e[32m✓ All checks passed!\e[0m"
+    echo -e "\e[32m✓ All checks passed!\e[0m"
   elif (( FAIL_COUNT == 0 )); then
-    echo -e "  \e[33m⚠ Some warnings detected (non-blocking)\e[0m"
+    echo -e "\e[33m⚠ Some warnings detected (non-blocking)\e[0m"
   else
-    echo -e "  \e[31m✗ Fix the issues above before continuing\e[0m"
+    echo -e "\e[31m✗ Fix the issues above before continuing\e[0m"
   fi
 else
   echo "{\"total\":{\"pass\":$PASS_COUNT,\"warn\":$WARN_COUNT,\"fail\":$FAIL_COUNT}}"
