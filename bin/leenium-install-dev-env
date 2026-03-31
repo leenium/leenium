@@ -87,7 +87,7 @@ laravel)
 symfony)
   echo -e "Installing PHP and Symfony...\n"
   install_php
-  leenium-pkg-add symfony-cli
+  leenium-pkg-aur-add symfony-cli-bin
   echo -e "\nYou can now run: symfony new --webapp myproject"
   ;;
 python)
