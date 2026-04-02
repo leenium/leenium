@@ -462,7 +462,7 @@ show_install_menu() {
 # }
 
 show_install_service_menu() {
-  case $(menu "Install" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account") in
+  case $(menu "Install" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account\n󰏖  ONCE") in
   *Tailscale*) present_terminal leenium-install-tailscale ;;
   *NordVPN*) present_terminal leenium-install-nordvpn ;;
   # *Bitwarden*) install_and_launch "Bitwarden" "bitwarden bitwarden-cli" "bitwarden" ;;
@@ -471,6 +471,7 @@ show_install_service_menu() {
   *Signal*) install "Signal" "signal-desktop" ;;
   *Discord*) install "Discord" "discord" ;;
   *Chromium*) present_terminal leenium-install-chromium-google-account ;;
+  *ONCE*) present_terminal leenium-install-once ;;
   *) show_install_menu ;;
   esac
 }
