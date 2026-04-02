@@ -462,7 +462,7 @@ show_install_menu() {
 # }
 
 show_install_service_menu() {
-  case $(menu "Install" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account\n󰏖  ONCE") in
+  case $(menu "Install" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account\n󰏖  ONCE [AUR]") in
   *Tailscale*) present_terminal leenium-install-tailscale ;;
   *NordVPN*) present_terminal leenium-install-nordvpn ;;
   # *Bitwarden*) install_and_launch "Bitwarden" "bitwarden bitwarden-cli" "bitwarden" ;;
@@ -615,13 +615,14 @@ show_remove_menu() {
 }
 
 show_remove_service_menu() {
-  case $(menu "Remove" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account") in
+  case $(menu "Remove" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account\n󰏖  ONCE [AUR]") in
   *Tailscale*) present_terminal "leenium-pkg-drop tailscale && leenium-webapp-remove Tailscale || true" ;;
   *NordVPN*) present_terminal "leenium-pkg-drop nordvpn-bin" ;;
   *Telegram*) present_terminal "leenium-pkg-drop telegram-desktop" ;;
   *Signal*) present_terminal "leenium-pkg-drop signal-desktop" ;;
   *Discord*) present_terminal "leenium-pkg-drop discord" ;;
   *Chromium*) present_terminal "if [[ -f ~/.config/chromium-flags.conf ]]; then sed -i '/--oauth2-client-id=77185425430\\.apps\\.googleusercontent\\.com/d; /--oauth2-client-secret=OTJgUOQcT7lO7GsGZq2G4IlT/d' ~/.config/chromium-flags.conf; fi" ;;
+  *ONCE*) present_terminal "leenium-pkg-drop once-bin" ;;
   *) show_remove_menu ;;
   esac
 }
