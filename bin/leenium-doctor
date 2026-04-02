@@ -1026,10 +1026,10 @@ section_network() {
 
   announce_check "Checking package server"
   if command -v curl >/dev/null 2>&1; then
-    if curl -s --connect-timeout 5 --max-time 10 -I "https://pkgs.omarchy.org/" >/dev/null 2>&1; then
-      pass "Package server (pkgs.omarchy.org) is reachable"
+    if curl -s --connect-timeout 5 --max-time 10 -I "https://pkgs.leenium.org/" >/dev/null 2>&1; then
+      pass "Package server (pkgs.leenium.org) is reachable"
     else
-      warn "Package server (pkgs.omarchy.org) is not reachable"
+      warn "Package server (pkgs.leenium.org) is not reachable"
     fi
   else
     warn "curl not available, skipping network check"
@@ -1037,10 +1037,10 @@ section_network() {
 
   announce_check "Checking DNS resolution"
   if command -v host >/dev/null 2>&1; then
-    if host "omarchy.org" >/dev/null 2>&1; then
-      pass "DNS resolution for omarchy.org works"
+    if host "leenium.org" >/dev/null 2>&1; then
+      pass "DNS resolution for leenium.org works"
     else
-      warn "DNS resolution for omarchy.org failed"
+      warn "DNS resolution for leenium.org failed"
     fi
   fi
 }
