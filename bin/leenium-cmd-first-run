@@ -15,6 +15,7 @@ if [[ -f $FIRST_RUN_MODE ]]; then
   bash "$LEENIUM_PATH/install/first-run/dns-resolver.sh"
   bash "$LEENIUM_PATH/install/first-run/gnome-theme.sh"
   bash "$LEENIUM_PATH/install/first-run/elephant.sh"
+  bash "$LEENIUM_PATH/install/config/first-run/powerprofilesctl-rules.sh"
   sudo rm -f /etc/sudoers.d/first-run
 
   bash "$LEENIUM_PATH/install/first-run/welcome.sh"
