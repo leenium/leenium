@@ -6,5 +6,10 @@ echo -e "\e[32mUpdate Leenium\e[0m"
 
 leenium-update-time
 
+# Suppress Hyprland config errors while git updates default config files mid-pull
+hyprctl keyword debug:suppress_errors true &>/dev/null || true
+
 git -C "$LEENIUM_PATH" pull --autostash
 git -C "$LEENIUM_PATH" --no-pager diff --check || git -C "$LEENIUM_PATH" reset --merge
+
+hyprctl reload &>/dev/null || true
