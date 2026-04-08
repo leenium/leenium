@@ -1,6 +1,14 @@
 #!/bin/bash
 
 set -e
+
+# Run the update inside a PTY so pacman/yay keep showing download progress
+# while still logging the full session for later analysis.
+if [[ -z $LEENIUM_UPDATE_LOGGED ]]; then
+  script_command=$(printf '%q ' "$0" "$@")
+  exec env LEENIUM_UPDATE_LOGGED=1 script -qefc "$script_command" "/tmp/leenium-update.log"
+fi
+
 LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
 
 record_update_history() {
