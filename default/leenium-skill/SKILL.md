@@ -13,7 +13,7 @@ description: >
 
 # Leenium Skill
 
-Manage [Leenium](https://leenium.drunkleen.com/) Linux systems - a beautiful, modern, opinionated Arch Linux distribution with Hyprland.
+Manage [Leenium](https://leenium.org/) Linux systems - a beautiful, modern, opinionated Arch Linux distribution with Hyprland.
 
 This skill is for end-user customization on installed systems.
 It is not for contributing to Leenium source code.

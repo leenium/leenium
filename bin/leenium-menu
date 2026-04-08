@@ -135,7 +135,7 @@ show_learn_menu() {
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Keybindings*) leenium-menu-keybindings ;;
-  *Leenium*) leenium-launch-webapp "https://leenium.drunkleen.com" ;;
+  *Leenium*) leenium-launch-webapp "https://leenium.org" ;;
   *Hyprland*) leenium-launch-webapp "https://wiki.hypr.land/" ;;
   *Arch*) leenium-launch-webapp "https://wiki.archlinux.org/title/Main_page" ;;
   *Bash*) leenium-launch-webapp "https://devhints.io/bash" ;;
