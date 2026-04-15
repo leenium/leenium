@@ -4,7 +4,7 @@ The Leenium installer is the post-`archinstall` layer that turns a base Arch sys
 
 It is not a generic Linux installer. This repo is the opinionated system payload: packages, defaults, UI, shell tooling, theming, desktop integration, hardware tweaks, and first-run behavior.
 
-The public project site lives at [leenium.drunkleen.com](https://leenium.drunkleen.com).
+The public project site lives at [leenium.org](https://leenium.org).
 
 Leenium is a fork of [Omarchy](https://github.com/basecamp/omarchy).
 

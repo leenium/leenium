@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Toggle microphone mute. Dell XPS systems get special handling for the hardware LED.
+
+if leenium-hw-match "XPS"; then
+  leenium-cmd-mic-mute-xps
+else
+  swayosd-client --monitor "$(leenium-hyprland-monitor-focused)" --input-volume mute-toggle
+fi
