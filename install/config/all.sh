@@ -15,7 +15,6 @@ run_logged $LEENIUM_INSTALL/config/fix-powerprofilesctl-shebang.sh
 run_logged $LEENIUM_INSTALL/config/docker.sh
 run_logged $LEENIUM_INSTALL/config/mimetypes.sh
 run_logged $LEENIUM_INSTALL/config/nautilus-python.sh
-run_logged $LEENIUM_INSTALL/config/remove-fcitx5-autostart.sh
 run_logged $LEENIUM_INSTALL/config/localdb.sh
 run_logged $LEENIUM_INSTALL/config/walker-elephant.sh
 run_logged $LEENIUM_INSTALL/config/fast-shutdown.sh
