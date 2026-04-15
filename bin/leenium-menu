@@ -322,7 +322,7 @@ show_font_menu() {
 
 show_settings_menu() {
   local options="󰘦  Config\n󱌣  Maintenance\n  Audio\n  Connectivity\n󱐋  Power Profile\n  System Sleep"
-  options="$options\n󰍹  Monitors\n  Hardware\n  Key Remapping\n󰱔  DNS\n  Security"
+  options="$options\n󰍹  Monitors\n  Hardware\n󰱔  DNS\n  Security"
 
   case $(menu "Settings" "$options") in
   "$MENU_BACK") show_main_menu ;;
@@ -335,7 +335,6 @@ show_settings_menu() {
   *System*) show_setup_system_menu ;;
   *Monitors*) nwg-displays;;
   *Hardware*) show_hardware_menu ;;
-  *Key\ Remapping*) leenium-setup-makima && open_in_editor "$HOME/.config/makima/AT Translated Set 2 keyboard.toml" && leenium-restart-makima ;;
   *DNS*) present_terminal leenium-setup-dns ;;
   *Security*) show_setup_security_menu ;;
   *) show_main_menu ;;
@@ -758,10 +757,11 @@ show_maintenance_config_menu() {
 }
 
 show_maintenance_hardware_menu() {
-  case $(menu "Restart Hardware" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth") in
+  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth\n󰟸  Trackpad") in
   *Audio*) present_terminal leenium-restart-pipewire ;;
   *Wi-Fi*) present_terminal leenium-restart-wifi ;;
   *Bluetooth*) present_terminal leenium-restart-bluetooth ;;
+  *Trackpad*) present_terminal leenium-restart-trackpad ;;
   *) show_maintenance_menu ;;
   esac
 }
