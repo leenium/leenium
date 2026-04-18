@@ -145,12 +145,11 @@ show_learn_menu() {
 }
 
 show_action_menu() {
-  case $(menu "Actions" "  Capture\n  Share\n󰔎  Toggle") in
+  case $(menu "Actions" "  Capture\n  Share") in
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Capture*) show_capture_menu ;;
   *Share*) show_share_menu ;;
-  *Toggle*) show_toggle_menu ;;
   *) show_main_menu ;;
   esac
 }
@@ -328,7 +327,7 @@ show_font_menu() {
 
 show_settings_menu() {
   local options="󰘦  Config\n󱌣  Maintenance\n  Audio\n  Connectivity\n󱐋  Power Profile\n  System Sleep"
-  options="$options\n󰍹  Monitors\n  Hardware\n󰱔  DNS\n  Security"
+  options="$options\n󰍹  Monitors\n  Hardware\n󰱔  DNS\n  Security\n󰔎  Toggle"
 
   case $(menu "Settings" "$options") in
   "$MENU_BACK") show_main_menu ;;
@@ -343,6 +342,7 @@ show_settings_menu() {
   *Hardware*) show_hardware_menu ;;
   *DNS*) present_terminal leenium-setup-dns ;;
   *Security*) show_setup_security_menu ;;
+  *Toggle*) show_toggle_menu ;;
   *) show_main_menu ;;
   esac
 }
