@@ -22,7 +22,9 @@ run_logged $LEENIUM_INSTALL/config/unmount-fuse.sh
 run_logged $LEENIUM_INSTALL/config/sudoless-asdcontrol.sh
 run_logged $LEENIUM_INSTALL/config/input-group.sh
 run_logged $LEENIUM_INSTALL/config/leenium-ai-skill.sh
+run_logged $LEENIUM_INSTALL/config/leenium-toggles.sh
 run_logged $LEENIUM_INSTALL/config/kernel-modules-hook.sh
+run_logged $LEENIUM_INSTALL/config/powerprofilesctl-rules.sh
 run_logged $LEENIUM_INSTALL/config/wifi-powersave-rules.sh
 run_logged $LEENIUM_INSTALL/config/plocate-ac-only.sh
 
@@ -42,6 +44,7 @@ run_logged $LEENIUM_INSTALL/config/hardware/intel-thermald.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel/ipu7-camera.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel/ptl-kernel.sh
 run_logged $LEENIUM_INSTALL/config/hardware/intel/fix-wifi7-eht.sh
+run_logged $LEENIUM_INSTALL/config/hardware/intel/resume-boost.sh
 
 run_logged $LEENIUM_INSTALL/config/hardware/dell/fix-xps-ptl-display.sh
 run_logged $LEENIUM_INSTALL/config/hardware/dell/fix-xps-haptic-touchpad.sh
