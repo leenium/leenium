@@ -16,5 +16,5 @@
 # Example of overriding just the about menu action: (Using zsh instead of bash (default))
 #
 # show_about() {
-#   exec leenium-launch-or-focus-tui "zsh -c 'fastfetch; read -k 1'"
+#   exec leenium-launch-or-focus-tui "zsh -c 'leenfetch --ascii_distro leenium; read -k 1'"
 # }

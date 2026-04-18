@@ -162,7 +162,7 @@ cat $(which leenium-theme-set)
 | App | Location |
 |-----|----------|
 | btop | `~/.config/btop/btop.conf` |
-| fastfetch | `~/.config/fastfetch/config.jsonc` |
+| leenfetch | `~/.config/leenfetch/config.jsonc` |
 | lazygit | `~/.config/lazygit/config.yml` |
 | starship | `~/.config/starship.toml` |
 | git | `~/.config/git/config` |
