@@ -1,0 +1,55 @@
+// ===============================
+// config.jsonc - Unified configuration for leenfetch
+// ===============================
+{
+    "flags": {
+        "ascii_distro": "leenium",
+        "ascii_colors": "distro",
+        "custom_ascii_path": "~/.config/leenium/branding/about.txt",
+        "battery_display": "off",
+        "color_blocks": "●",
+        "cpu_brand": true,
+        "cpu_cores": true,
+        "cpu_frequency": true,
+        "cpu_speed": true,
+        "cpu_temp": "C",
+        "cpu_show_temp": false,
+        "de_version": true,
+        "distro_display": "name",
+        "disk_display": "info",
+        "disk_subtitle": "dir",
+        "memory_unit": "mib",
+        "package_managers": "tiny",
+        "refresh_rate": true,
+        "shell_path": false,
+        "shell_version": true,
+        "uptime_shorthand": "tiny",
+        "os_age_shorthand": "tiny"
+    },
+    "modules": [
+        { "type": "custom", "format": "${reset}╭─────────────────────${c1}System${reset}─────────────────────╮" },
+        { "type": "titles", "key": "${reset}│${c1} ╭:"},
+        { "type": "distro", "key": "${reset}│${c1} ├:"},
+        { "type": "kernel", "key": "${reset}│${c1} ├:"},
+        { "type": "packages", "key": "${reset}│${c1} ├󰏖:"},
+        { "type": "shell", "key": "${reset}│ ${c1}├:"},
+        { "type": "wm", "key": "${reset}│${c1} ├:"},
+        { "type": "de", "key": "${reset}│${c1} ├󰇄:"},
+        { "type": "song", "key": "${reset}│${c1} ├"},
+        { "type": "theme", "key": "${reset}│${c1} ├󰸌:"},
+        { "type": "colors", "key": "${reset}│${c1} ╰:"},
+        { "type": "custom", "format": "${reset}╰────────────────────────────────────────────────╯" },
+        { "type": "custom", "format": "${reset}╭────────────────────${c1}Hardware${reset}────────────────────╮" },
+        { "type": "model", "key": "${reset}│${c1} ╭:"},
+        { "type": "cpu", "key": "${reset}│${c1} ├:"},
+        { "type": "gpu", "key": "${reset}│${c1} ├:"},
+        { "type": "disk", "key": "${reset}│${c1} ├󰋊:"},
+        { "type": "resolution", "key": "${reset}│${c1} ├󱄄:"},
+        { "type": "memory", "key": "${reset}│${c1} ╰:"},
+        { "type": "custom", "format": "${reset}╰────────────────────────────────────────────────╯" },
+        { "type": "custom", "format": "${reset}╭───────────────────${c1}Age/Uptime${reset}───────────────────╮" },
+        { "type": "os_age", "key": "${reset}│${c1} ╭󱦟 OS Age"},
+        { "type": "uptime", "key": "${reset}│${c1} ╰󱫐 Uptime"},
+        { "type": "custom", "format": "${reset}╰────────────────────────────────────────────────╯" }
+    ]
+}
