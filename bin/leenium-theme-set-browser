@@ -14,11 +14,11 @@ if leenium-cmd-present chromium || leenium-cmd-present brave; then
 
   if leenium-cmd-present chromium; then
     echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\", \"BrowserColorScheme\": \"device\"}" | tee "/etc/chromium/policies/managed/color.json" >/dev/null
-    chromium --refresh-platform-policy --no-startup-window >/dev/null
+    chromium --refresh-platform-policy --no-startup-window &>/dev/null
   fi
 
   if leenium-cmd-present brave; then
     echo "{\"BrowserThemeColor\": \"$THEME_HEX_COLOR\", \"BrowserColorScheme\": \"device\"}" | tee "/etc/brave/policies/managed/color.json" >/dev/null
-    brave --refresh-platform-policy --no-startup-window >/dev/null
+    brave --refresh-platform-policy --no-startup-window &>/dev/null
   fi
 fi
