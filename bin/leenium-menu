@@ -145,12 +145,11 @@ show_learn_menu() {
 }
 
 show_action_menu() {
-  case $(menu "Actions" "  Capture\n  Share\n󰔎  Toggle") in
+  case $(menu "Actions" "  Capture\n  Share") in
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Capture*) show_capture_menu ;;
   *Share*) show_share_menu ;;
-  *Toggle*) show_toggle_menu ;;
   *) show_main_menu ;;
   esac
 }
@@ -263,8 +262,13 @@ show_share_menu() {
 }
 
 show_toggle_menu() {
-  case $(menu "Toggle" "󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n󰛧  Laptop Display") in
+  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n󰛧  Laptop Display"
 
+  if hyprctl devices -j 2>/dev/null | jq -e '[.mice[] | select(.name | test("touchpad|trackpad"; "i"))] | length > 0' >/dev/null; then
+    options="$options\n󰟸  Touchpad"
+  fi
+
+  case $(menu "Toggle" "$options") in
   "$MENU_BACK") back_to show_action_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Screensaver*) leenium-toggle-screensaver ;;
@@ -276,6 +280,7 @@ show_toggle_menu() {
   *Gaps*) leenium-hyprland-window-gaps-toggle ;;
   *Scaling*) leenium-hyprland-monitor-scaling-cycle ;;
   *Laptop*) leenium-hyprland-monitor-internal-toggle ;;
+  *Touchpad*) leenium-toggle-touchpad ;;
   *) back_to show_action_menu ;;
   esac
 }
@@ -322,7 +327,7 @@ show_font_menu() {
 
 show_settings_menu() {
   local options="󰘦  Config\n󱌣  Maintenance\n  Audio\n  Connectivity\n󱐋  Power Profile\n  System Sleep"
-  options="$options\n󰍹  Monitors\n  Hardware\n󰱔  DNS\n  Security"
+  options="$options\n󰍹  Monitors\n  Hardware\n󰱔  DNS\n  Security\n󰔎  Toggle"
 
   case $(menu "Settings" "$options") in
   "$MENU_BACK") show_main_menu ;;
@@ -337,6 +342,7 @@ show_settings_menu() {
   *Hardware*) show_hardware_menu ;;
   *DNS*) present_terminal leenium-setup-dns ;;
   *Security*) show_setup_security_menu ;;
+  *Toggle*) show_toggle_menu ;;
   *) show_main_menu ;;
   esac
 }
@@ -396,7 +402,7 @@ show_setup_config_menu() {
 show_setup_system_menu() {
   local options=""
 
-  if [[ -f ~/.local/state/leenium/toggles/suspend-off ]]; then
+  if leenium-toggle-enabled suspend-off; then
     options="$options󰒲  Enable Suspend"
   else
     options="$options󰒲  Disable Suspend"
@@ -731,9 +737,10 @@ show_maintenance_menu() {
 }
 
 show_maintenance_process_menu() {
-  case $(menu "Restart Services" "  Hypridle\n  Hyprsunset\n  Swayosd\n󰌧  Walker\n󰍜  Waybar") in
+  case $(menu "Restart Services" "  Hypridle\n  Hyprsunset\n󰎟  Mako\n  Swayosd\n󰌧  Walker\n󰍜  Waybar") in
   *Hypridle*) leenium-restart-hypridle ;;
   *Hyprsunset*) leenium-restart-hyprsunset ;;
+  *Mako*) leenium-restart-mako ;;
   *Swayosd*) leenium-restart-swayosd ;;
   *Walker*) leenium-restart-walker ;;
   *Waybar*) leenium-restart-waybar ;;
@@ -780,7 +787,7 @@ show_about() {
 
 show_system_menu() {
   local options="󱄄  Screensaver\n  Lock"
-  [[ ! -f ~/.local/state/leenium/toggles/suspend-off ]] && options="$options\n󰒲  Suspend"
+  ! leenium-toggle-enabled suspend-off && options="$options\n󰒲  Suspend"
   leenium-hibernation-available && options="$options\n󰤁  Hibernate"
   options="$options\n󰍃  Logout\n󰜉  Restart\n󰐥  Shutdown"
 

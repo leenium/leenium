@@ -13,7 +13,7 @@ set_theme() {
   local tmp_settings
   local jq_filter
 
-  leenium-cmd-present "$editor_cmd" && [[ ! -f $skip_flag ]] || return 0
+  leenium-cmd-present "$editor_cmd" || return 0
 
   if [[ -f $VS_CODE_THEME ]]; then
     theme_name=$(jq -r '.name' "$VS_CODE_THEME")
@@ -56,7 +56,7 @@ set_theme() {
   fi
 }
 
-set_theme "code" "$HOME/.config/Code/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-vscode-theme-changes"
-set_theme "code-insiders" "$HOME/.config/Code - Insiders/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-vscode-insiders-theme-changes"
-set_theme "codium" "$HOME/.config/VSCodium/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-codium-theme-changes"
-set_theme "cursor" "$HOME/.config/Cursor/User/settings.json" "$HOME/.local/state/leenium/toggles/skip-cursor-theme-changes"
+! leenium-toggle-enabled skip-vscode-theme-changes && set_theme "code" "$HOME/.config/Code/User/settings.json"
+! leenium-toggle-enabled skip-vscode-insiders-theme-changes && set_theme "code-insiders" "$HOME/.config/Code - Insiders/User/settings.json"
+! leenium-toggle-enabled skip-codium-theme-changes && set_theme "codium" "$HOME/.config/VSCodium/User/settings.json"
+! leenium-toggle-enabled skip-cursor-theme-changes && set_theme "cursor" "$HOME/.config/Cursor/User/settings.json"
