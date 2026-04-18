@@ -30,7 +30,6 @@ evince
 exfatprogs
 expac
 eza
-fastfetch
 fcitx5
 fcitx5-gtk
 fcitx5-qt
@@ -68,6 +67,7 @@ kitty
 kvantum-qt5
 lazydocker
 lazygit
+leenfetch
 less
 libsecret
 libyaml

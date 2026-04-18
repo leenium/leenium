@@ -6,14 +6,14 @@ LOG_TYPE="${1:-install}"
 TEMP_LOG="/tmp/upload-log.txt"
 SYSTEM_INFO="/tmp/system-info.txt"
 
-# Get system information if fastfetch is available
-if command -v fastfetch >/dev/null 2>&1; then
+# Get system information if leenfetch is available
+if command -v leenfetch >/dev/null 2>&1; then
   {
     echo "========================================="
     echo "SYSTEM INFORMATION"
     echo "========================================="
-    # Use fastfetch with no logo to get clean output
-    fastfetch --logo none --pipe 2>/dev/null || echo "Failed to get system info"
+    # Use leenfetch with no logo to get clean output
+    leenfetch --logo none --pipe 2>/dev/null || echo "Failed to get system info"
     echo ""
     echo "========================================="
     echo "LOG CONTENT"
@@ -21,7 +21,7 @@ if command -v fastfetch >/dev/null 2>&1; then
     echo ""
   } >"$SYSTEM_INFO"
 else
-  # Fallback to basic info if fastfetch isn't available
+  # Fallback to basic info if leenfetch isn't available
   {
     echo "========================================="
     echo "SYSTEM INFORMATION"
