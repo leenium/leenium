@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Launch the fastfetch TUI that gives information about the current system.
+# Launch the leenfetch TUI that gives information about the current system.
 
-exec leenium-launch-or-focus-tui "zsh -lc 'fastfetch; read -k 1'"
+exec leenium-launch-or-focus-tui "zsh -lc 'leenfetch --ascii_distro leenium; read -k 1'"
