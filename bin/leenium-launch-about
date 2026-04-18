@@ -2,4 +2,5 @@
 
 # Launch the leenfetch TUI that gives information about the current system.
 
-exec leenium-launch-or-focus-tui "zsh -lc 'leenfetch --ascii_distro leenium; read -k 1'"
+exec leenium-launch-or-focus "org.leenium.about" \
+  "setsid uwsm-app -- xdg-terminal-exec --app-id=org.leenium.about -e zsh -lc 'leenfetch --ascii_distro leenium; read -k 1'"
