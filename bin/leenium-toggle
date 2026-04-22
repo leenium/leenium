@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Toggle Omarchy features between enabled and disabled
+# Toggle Leenium features between enabled and disabled
 
 ENABLED_NOTIFICATION=""
 DISABLED_NOTIFICATION=""

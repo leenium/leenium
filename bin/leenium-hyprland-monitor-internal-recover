@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Re-enable the internal display if it was toggled off and no external monitors
+# are currently active (e.g. external got disconnected live, during sleep, or
+# wasn't present on boot).
+
+if leenium-hyprland-monitors-none && leenium-hyprland-toggle-enabled internal-monitor-disable; then
+  leenium-hyprland-monitor-internal-enable
+fi

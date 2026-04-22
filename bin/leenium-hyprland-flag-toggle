@@ -15,7 +15,7 @@ done
 
 FLAG_NAME="$1"
 FLAG="$HOME/.local/state/leenium/toggles/hypr/$FLAG_NAME.conf"
-FLAG_SOURCE="$OMARCHY_PATH/default/hypr/toggles/$FLAG_NAME.conf"
+FLAG_SOURCE="$LEENIUM_PATH/default/hypr/toggles/$FLAG_NAME.conf"
 
 if [[ -f $FLAG ]]; then
   rm $FLAG
@@ -24,7 +24,7 @@ elif [[ -f $FLAG_SOURCE ]]; then
   cp $FLAG_SOURCE $FLAG
   [[ -n $ENABLED_NOTIFICATION ]] && notify-send -u low "$ENABLED_NOTIFICATION"
 else
-  echo "Flag not found"
+  echo "Flag not found: $FLAG_NAME"
   exit 1
 fi
 

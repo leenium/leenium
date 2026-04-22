@@ -1,9 +1,6 @@
 #!/bin/bash
 
-leenium-toggle \
-  --enabled-notification "   Bar hidden" \
-  --disabled-notification "   Bar visible" \
-  waybar-off
+leenium-toggle waybar-off
 
 if pgrep -x waybar >/dev/null; then
   pkill -x waybar
