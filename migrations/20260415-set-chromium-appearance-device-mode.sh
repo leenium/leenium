@@ -1,5 +1,5 @@
 echo "Set Chromium appearance mode to device (follow system) by default"
-MIGRATION_VERSION="1.0.0"
+MIGRATION_VERSION="1.1.0"
 
 initial_preferences_path="/usr/lib/chromium/initial_preferences"
 initial_preferences_tmp=$(mktemp)

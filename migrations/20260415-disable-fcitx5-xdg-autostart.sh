@@ -1,5 +1,5 @@
 echo "Disable the XDG autostart entry for Fcitx5 and refresh XCompose"
-MIGRATION_VERSION="1.0.0"
+MIGRATION_VERSION="1.1.0"
 
 source_file="$LEENIUM_PATH/config/autostart/org.fcitx.Fcitx5.desktop"
 target_dir="$HOME/.config/autostart"
