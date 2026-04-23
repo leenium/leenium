@@ -7,3 +7,5 @@ leenium-refresh-config hypr/bindings.conf
 leenium-refresh-config hypr/input.conf
 leenium-refresh-config hypr/looknfeel.conf
 leenium-refresh-config hypr/hyprland.conf
+leenium-refresh-config hypr/monitors.conf
+bash "$LEENIUM_PATH/install/config/detect-keyboard-layout.sh"

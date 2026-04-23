@@ -264,7 +264,7 @@ show_share_menu() {
 show_toggle_menu() {
   local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n󰛧  Laptop Display"
 
-  if hyprctl devices -j 2>/dev/null | jq -e '[.mice[] | select(.name | test("touchpad|trackpad"; "i"))] | length > 0' >/dev/null; then
+  if [[ -n "$(leenium-hw-touchpad)" ]]; then
     options="$options\n󰟸  Touchpad"
   fi
 
@@ -279,19 +279,33 @@ show_toggle_menu() {
   *Ratio*) leenium-hyprland-window-single-square-aspect-toggle ;;
   *Gaps*) leenium-hyprland-window-gaps-toggle ;;
   *Scaling*) leenium-hyprland-monitor-scaling-cycle ;;
-  *Laptop*) leenium-hyprland-monitor-internal-toggle ;;
+  *Laptop*) leenium-hyprland-monitor-internal toggle ;;
   *Touchpad*) leenium-toggle-touchpad ;;
   *) back_to show_action_menu ;;
   esac
 }
 
 show_hardware_menu() {
-  case $(menu "Hardware" "  Hybrid GPU") in
+  local options="󰛧  Laptop Display"
+
+  if leenium-hw-hybrid-gpu; then
+    options="$options\n  Hybrid GPU"
+  fi
+
+  if leenium-hw-touchpad; then
+    options="$options\n󰟸  Touchpad"
+  fi
+
+  case $(menu "Toggle" "$options") in
+
   "$MENU_BACK") show_settings_menu ;;
   "$MENU_EXIT") exit 0 ;;
+  *Laptop*) leenium-hyprland-monitor-internal toggle ;;
+  *Touchpad*) leenium-toggle-touchpad ;;
   *"Hybrid GPU"*) present_terminal leenium-toggle-hybrid-gpu ;;
-  *) show_settings_menu ;;
+  *) back_to show_trigger_menu ;;
   esac
+
 }
 
 show_appearance_menu() {
@@ -824,6 +838,7 @@ go_to_menu() {
 
   *share*) show_share_menu ;;
   *toggle*) show_toggle_menu ;;
+  *hardware*) show_hardware_menu ;;
   *background*) show_background_menu ;;
   *capture*) show_capture_menu ;;
   *theme*) show_theme_menu ;;
