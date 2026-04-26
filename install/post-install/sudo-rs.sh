@@ -6,6 +6,12 @@ if [ ! -f /etc/sudoers ]; then
   sudo chmod 440 /etc/sudoers
 fi
 
+# Disable password character echo (sudo-rs shows * by default)
+if ! sudo grep -q '!pwfeedback' /etc/sudoers; then
+  sudo sh -c 'echo "Defaults !pwfeedback" >> /etc/sudoers'
+fi
+
+
 # Ensure PAM config exists for sudo-rs authentication
 if [ ! -f /etc/pam.d/sudo ]; then
   sudo tee /etc/pam.d/sudo > /dev/null << 'EOF'
