@@ -262,7 +262,7 @@ show_share_menu() {
 }
 
 show_toggle_menu() {
-  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n󰛧  Laptop Display"
+  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display"
 
   if [[ -n "$(leenium-hw-touchpad)" ]]; then
     options="$options\n󰟸  Touchpad"
@@ -279,6 +279,7 @@ show_toggle_menu() {
   *Ratio*) leenium-hyprland-window-single-square-aspect-toggle ;;
   *Gaps*) leenium-hyprland-window-gaps-toggle ;;
   *Scaling*) leenium-hyprland-monitor-scaling-cycle ;;
+  *"Direct Boot"*) present_terminal leenium-config-direct-boot ;;
   *Laptop*) leenium-hyprland-monitor-internal toggle ;;
   *Touchpad*) leenium-toggle-touchpad ;;
   *) back_to show_action_menu ;;
