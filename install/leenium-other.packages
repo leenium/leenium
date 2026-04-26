@@ -27,6 +27,7 @@ libva-nvidia-driver
 limine
 limine-mkinitcpio-hook
 limine-snapper-sync
+sudo
 linux
 linux-firmware
 linux-headers
