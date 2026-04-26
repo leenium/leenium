@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# Toggle the internal laptop display on/off.
-
-if leenium-hyprland-toggle-enabled internal-monitor-disable; then
-  leenium-hyprland-monitor-internal-enable
-else
-  leenium-hyprland-monitor-internal-disable
-fi

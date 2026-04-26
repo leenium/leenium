@@ -38,7 +38,6 @@ if [[ -e /sys/class/leds/platform::micmute/brightness ]]; then
   done
 fi
 
-swayosd-client \
-  --monitor "$(leenium-hyprland-monitor-focused)" \
+leenium-swayosd-client \
   --custom-message "$osd_message" \
   --custom-icon "$osd_icon"

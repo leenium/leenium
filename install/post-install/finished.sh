@@ -20,10 +20,6 @@ else
   echo_in_style "Finished installing"
 fi
 
-if sudo test -f /etc/sudoers.d/99-leenium-installer; then
-  sudo rm -f /etc/sudoers.d/99-leenium-installer &>/dev/null
-fi
-
 # Exit gracefully if user chooses not to reboot
 if gum confirm --padding "0 0 0 $((PADDING_LEFT + 32))" --show-help=false --default --affirmative "Reboot Now" --negative "" ""; then
   # Clear screen to hide any shutdown messages
