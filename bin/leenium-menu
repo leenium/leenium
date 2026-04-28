@@ -520,8 +520,8 @@ show_install_terminal_menu() {
 
 show_install_ai_menu() {
   ollama_pkg=$(
-    (command -v nvidia-smi &>/dev/null && echo ollama-cuda) ||
-      (command -v rocminfo &>/dev/null && echo ollama-rocm) ||
+    (leenium-cmd-present nvidia-smi && echo ollama-cuda) ||
+      (leenium-cmd-present rocminfo && echo ollama-rocm) ||
       echo ollama
   )
 
