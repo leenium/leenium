@@ -1,0 +1,48 @@
+name: Theme Submission
+description: Submit a new theme for inclusion in Leenium
+labels: [theme]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submit a theme to be included in Leenium's built-in theme set. Link your PR below and include screenshots.
+
+  - type: input
+    id: theme-name
+    attributes:
+      label: Theme name
+      placeholder: e.g. dracula
+    validations:
+      required: true
+
+  - type: input
+    id: pr-link
+    attributes:
+      label: Pull request
+      placeholder: https://github.com/leenium/leenium/pull/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What's the vibe? What inspired it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: coverage
+    attributes:
+      label: What does it cover?
+      description: "List what components are styled: Hyprland, Waybar, terminal, Walker, wallpaper, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Attach at least one screenshot showing the theme in use.
+    validations:
+      required: true
