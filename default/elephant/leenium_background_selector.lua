@@ -40,6 +40,7 @@ function GetEntries()
   if theme_name then
     table.insert(dirs, home .. "/.config/leenium/backgrounds/" .. theme_name)
   end
+  table.insert(dirs, home .. "/Pictures/Wallpapers")
 
   -- Track added files to avoid duplicates
   local seen = {}

@@ -24,6 +24,9 @@ When = PostTransaction
 Exec = $LEENIUM_PATH/bin/leenium-restart-walker
 EOF
 
+# Ensure user wallpaper directory exists for background selector
+mkdir -p ~/Pictures/Wallpapers
+
 # Link the visual theme menu config
 mkdir -p ~/.config/elephant/menus
 ln -snf $LEENIUM_PATH/default/elephant/leenium_themes.lua ~/.config/elephant/menus/leenium_themes.lua
