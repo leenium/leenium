@@ -3,9 +3,9 @@
 # Toggle microphone mute. Dell XPS and ThinkPad systems get special handling for the hardware LED.
 
 if leenium-hw-match "XPS"; then
-  leenium-cmd-mic-mute-xps
+  leenium-audio-input-mute-xps
 elif leenium-hw-match "ThinkPad"; then
-  leenium-cmd-mic-mute-thinkpad
+  leenium-audio-input-mute-thinkpad
 else
   leenium-swayosd-client --input-volume mute-toggle
 fi

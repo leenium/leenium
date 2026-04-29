@@ -307,7 +307,7 @@ leenium-font-set <name>         # Change font
 leenium-update                  # Full system update
 leenium-version                 # Show Leenium version
 leenium-debug --no-sudo --print # Debug info (ALWAYS use these flags)
-leenium-lock-screen             # Lock screen
+leenium-system-lock             # Lock screen
 leenium-system-shutdown         # Shutdown
 leenium-system-reboot           # Reboot
 ```
