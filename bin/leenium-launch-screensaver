@@ -29,21 +29,21 @@ for m in $(hyprctl monitors -j | jq -r '.[] | .name'); do
     hyprctl dispatch exec -- \
       alacritty --class=org.leenium.screensaver \
       --config-file ~/.local/share/leenium/default/alacritty/screensaver.toml \
-      -e leenium-cmd-screensaver
+      -e leenium-screensaver
     ;;
   *ghostty*)
     hyprctl dispatch exec -- \
       ghostty --class=org.leenium.screensaver \
       --config-file=~/.local/share/leenium/default/ghostty/screensaver \
       --font-size=18 \
-      -e leenium-cmd-screensaver
+      -e leenium-screensaver
     ;;
   *kitty*)
     hyprctl dispatch exec -- \
       kitty --class=org.leenium.screensaver \
       --override font_size=18 \
       --override window_padding_width=0 \
-      -e leenium-cmd-screensaver
+      -e leenium-screensaver
     ;;
   *)
     notify-send -u low "✋  Screensaver only runs in Alacritty, Ghostty, or Kitty"

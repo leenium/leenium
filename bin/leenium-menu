@@ -254,15 +254,15 @@ show_share_menu() {
   case $(menu "Share" "  Clipboard\n  File \n  Folder") in
   "$MENU_BACK") back_to show_action_menu ;;
   "$MENU_EXIT") exit 0 ;;
-  *Clipboard*) leenium-cmd-share clipboard ;;
-  *File*) terminal bash -c "leenium-cmd-share file" ;;
-  *Folder*) terminal bash -c "leenium-cmd-share folder" ;;
+  *Clipboard*) leenium-menu-share clipboard ;;
+  *File*) terminal bash -c "leenium-menu-share file" ;;
+  *Folder*) terminal bash -c "leenium-menu-share folder" ;;
   *) back_to show_action_menu ;;
   esac
 }
 
 show_toggle_menu() {
-  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n󰛧  Laptop Display"
+  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display\n󰟵  Passwordless Sudo"
 
   if [[ -n "$(leenium-hw-touchpad)" ]]; then
     options="$options\n󰟸  Touchpad"
@@ -279,6 +279,8 @@ show_toggle_menu() {
   *Ratio*) leenium-hyprland-window-single-square-aspect-toggle ;;
   *Gaps*) leenium-hyprland-window-gaps-toggle ;;
   *Scaling*) leenium-hyprland-monitor-scaling-cycle ;;
+  *"Direct Boot"*) present_terminal leenium-config-direct-boot ;;
+  *"Passwordless Sudo"*) present_terminal leenium-sudo-passwordless ;;
   *Laptop*) leenium-hyprland-monitor-internal toggle ;;
   *Touchpad*) leenium-toggle-touchpad ;;
   *) back_to show_action_menu ;;
@@ -286,7 +288,7 @@ show_toggle_menu() {
 }
 
 show_hardware_menu() {
-  local options="󰛧  Laptop Display"
+  local options="󰛧  Laptop Display\n 󰍹  Mirror Display"
 
   if leenium-hw-hybrid-gpu; then
     options="$options\n  Hybrid GPU"
@@ -301,6 +303,7 @@ show_hardware_menu() {
   "$MENU_BACK") show_settings_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Laptop*) leenium-hyprland-monitor-internal toggle ;;
+  *Mirror*) leenium-hyprland-monitor-internal-mirror toggle;;
   *Touchpad*) leenium-toggle-touchpad ;;
   *"Hybrid GPU"*) present_terminal leenium-toggle-hybrid-gpu ;;
   *) back_to show_trigger_menu ;;
@@ -808,7 +811,7 @@ show_system_menu() {
 
   case $(menu "System" "$options") in
   *Screensaver*) leenium-launch-screensaver force ;;
-  *Lock*) leenium-lock-screen ;;
+  *Lock*) leenium-system-lock ;;
   *Suspend*) systemctl suspend ;;
   *Hibernate*) systemctl hibernate ;;
   *Logout*) leenium-system-logout ;;
