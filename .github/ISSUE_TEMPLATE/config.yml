@@ -6,3 +6,6 @@ contact_links:
   - name: Support
     url: https://leenium.org
     about: Need help? Join our Discord community for support with any issues. GitHub issues should be used for verified bugs only.
+  - name: Contributing
+    url: https://github.com/leenium/leenium/blob/master/CONTRIBUTING.md
+    about: Want to contribute? Read the contributing guide first.

@@ -309,10 +309,11 @@ show_hardware_menu() {
 }
 
 show_appearance_menu() {
-  case $(menu "Appearance" "󰸌  Theme\n  Font\n  Background\n  Hyprland\n󱄄  Screensaver\n  About") in
+  case $(menu "Appearance" "󰸌  Theme\n󰟵  Unlock\n  Font\n  Background\n  Hyprland\n󱄄  Screensaver\n  About") in
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Theme*) show_theme_menu ;;
+  *Unlock*) leenium-launch-walker -m menus:leeniumunlocks --width 800 --minheight 400 ;;
   *Font*) show_font_menu ;;
   *Background*) show_background_menu ;;
   *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
