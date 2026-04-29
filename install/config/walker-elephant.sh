@@ -28,3 +28,4 @@ EOF
 mkdir -p ~/.config/elephant/menus
 ln -snf $LEENIUM_PATH/default/elephant/leenium_themes.lua ~/.config/elephant/menus/leenium_themes.lua
 ln -snf $LEENIUM_PATH/default/elephant/leenium_background_selector.lua ~/.config/elephant/menus/leenium_background_selector.lua
+ln -snf $LEENIUM_PATH/default/elephant/leenium_unlocks.lua ~/.config/elephant/menus/leenium_unlocks.lua
