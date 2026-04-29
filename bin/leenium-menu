@@ -280,10 +280,7 @@ show_toggle_menu() {
   *Gaps*) leenium-hyprland-window-gaps-toggle ;;
   *Scaling*) leenium-hyprland-monitor-scaling-cycle ;;
   *"Direct Boot"*) present_terminal leenium-config-direct-boot ;;
-<<<<<<< HEAD
-=======
   *"Passwordless Sudo"*) present_terminal leenium-sudo-passwordless ;;
->>>>>>> fix
   *Laptop*) leenium-hyprland-monitor-internal toggle ;;
   *Touchpad*) leenium-toggle-touchpad ;;
   *) back_to show_action_menu ;;
