@@ -1,0 +1,43 @@
+name: Package Request
+description: Request a package be added to Leenium defaults
+labels: [package-request]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request a package to be included in Leenium's default package set or custom repo.
+
+  - type: input
+    id: package-name
+    attributes:
+      label: Package name
+      placeholder: e.g. leenfetch (AUR)
+    validations:
+      required: true
+
+  - type: input
+    id: package-url
+    attributes:
+      label: Package URL
+      placeholder: https://aur.archlinux.org/packages/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why does this belong in Leenium?
+      description: Explain what it does and why it fits Leenium's defaults.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Package type
+      options:
+        - AUR package
+        - Official repo package
+        - Other
+    validations:
+      required: true
