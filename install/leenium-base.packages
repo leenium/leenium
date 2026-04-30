@@ -27,6 +27,7 @@ docker-compose
 dosfstools
 dotnet-runtime-9.0
 dust
+elephant-all
 evince
 exfatprogs
 expac
@@ -93,7 +94,6 @@ noto-fonts-emoji
 nss-mdns
 nwg-displays
 obs-studio
-leenium-walker
 pamixer
 pinta
 playerctl
@@ -130,6 +130,7 @@ ufw-docker
 unzip
 usage
 uwsm
+walker
 waybar
 wget
 whois
