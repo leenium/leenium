@@ -33,4 +33,6 @@ if command -v update-desktop-database &>/dev/null; then
   update-desktop-database "$APP_DIR" &>/dev/null || true
 fi
 
+leenium-restart-walke
+
 echo "Web apps removed successfully."
