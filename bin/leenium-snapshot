@@ -44,6 +44,8 @@ create)
 
   for config in "${CONFIGS[@]}"; do
     snapshot_id=$(sudo snapper -c "$config" create -c number -d "$DESC" -p)
+    snapshot_id=$(sudo snapper -c "$config" cleanup number)
+
     SNAPSHOT_IDS+=("$config:$snapshot_id")
 
     if [[ $IDS_ONLY != "true" ]]; then
