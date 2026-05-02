@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Return exhaustive debugging information about the system to help diagnose problems.
+# leenium:summary=Print debugging information
+# leenium:args=[--no-sudo] [--print]
+# leenium:examples=leenium debug --print --no-sudo
+# leenium:requires-sudo=true
 
 NO_SUDO=false
 PRINT_ONLY=false

@@ -1,5 +1,6 @@
 #!/bin/bash
 
-# Launch the TUI command passed in as an argument in the default terminal with an org.leenium.COMMAND app id for styling.
+# leenium:summary=Launch a TUI command in the default terminal with Leemium styling
+# leenium:args=<command> [args...]
 
 exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.leenium.$(basename $1) -e "$1" "${@:2}"

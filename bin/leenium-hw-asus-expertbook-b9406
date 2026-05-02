@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Detect ASUS ExpertBook B9406 series laptops on Intel Panther Lake.
+# leenium:summary=Detect ASUS ExpertBook B9406 series laptops on Intel Panther Lake.
 
 leenium-hw-match "B9406" && leenium-hw-intel-ptl

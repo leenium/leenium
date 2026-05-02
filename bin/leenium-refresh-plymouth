@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Overwrite the user config for the Plymouth drive decryption and boot sequence with the Leenium default and rebuild it.
+# leenium:summary=Overwrite the user config for the Plymouth drive decryption and boot sequence with the Leemium default and rebuild it.
+# leenium:requires-sudo=true
 
 sudo cp ~/.local/share/leenium/default/plymouth/* /usr/share/plymouth/themes/leenium/
 sudo plymouth-set-default-theme leenium

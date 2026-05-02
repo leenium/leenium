@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# leenium-theme-remove: Remove a theme from Leenium by name
-# Usage: leenium-theme-remove <theme-name>
+# leenium:summary=Remove a user-installed theme
+# leenium:args=[theme-name]
+# leenium:examples=leenium theme remove "Tokyo Night"
 
 if [[ -z $1 ]]; then
   mapfile -t extra_themes < <(find ~/.config/leenium/themes -mindepth 1 -maxdepth 1 -type d ! -xtype l -printf '%f\n')

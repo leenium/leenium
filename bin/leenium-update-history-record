@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Append a Leenium update or rollback event to the local history log.
+# Append a Leenium update event to the local history log.
 
 STATE_DIR="$HOME/.local/state/leenium"
 HISTORY_FILE="$STATE_DIR/update-history.tsv"

@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# leenium:summary=Reinstall Leemium packages and reset default configs
+# leenium:requires-sudo=true
+
 set -e
 
 # Attempt to reinstall all default Leenium packages and reset all the default configs.

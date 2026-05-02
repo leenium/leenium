@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# Add the named packages to the system if they're missing. Returns false if it couldn't be done.
+# leenium:summary=Install Arch packages if they are missing
+# leenium:group=install
+# leenium:name=package
+# leenium:args=<packages...>
+# leenium:examples=leenium install package jq ripgrep
+# leenium:requires-sudo=true
 
 if leenium-pkg-missing "$@"; then
   sudo pacman -S --noconfirm --needed "$@" || exit 1

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Sync Leenium theme to VS Code, VSCodium, and Cursor
+# leenium:summary=Sync Leemium theme to VS Code, VSCodium, and Cursor
 
 VS_CODE_THEME="$HOME/.config/leenium/current/theme/vscode.json"
 

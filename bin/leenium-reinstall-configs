@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# leenium:summary=Reset all Leemium user configs to the defaults
+# leenium:requires-sudo=true
+
 set -e
 
 # Overwrite all user configs with the Leenium defaults.

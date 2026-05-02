@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Sync Leenium theme to all Obsidian vaults
+# leenium:summary=Sync Leemium theme to all Obsidian vaults
 
 CURRENT_THEME_DIR="$HOME/.config/leenium/current/theme"
 

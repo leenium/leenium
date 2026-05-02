@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# leenium:summary=Apply an Leemium theme
+# leenium:args=<theme-name>
+# leenium:examples=leenium theme list | leenium theme set "Tokyo Night"
+
 if [[ -z $1 ]]; then
   echo "Usage: leenium-theme-set <theme-name>"
   exit 1

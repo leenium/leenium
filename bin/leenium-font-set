@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Set the system-wide monospace font that should be used by the terminal, hyprlock, waybar, swayosd, etc.
-# The font name must be one of the ones returned by leenium-font-list.
+# leenium:summary=Set the system monospace font
+# leenium:args=<font-name>
+# leenium:examples=leenium font list | leenium font set "CaskaydiaMono Nerd Font"
 
 font_name="$1"
 

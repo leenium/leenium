@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# leenium:summary=Set up or remove FIDO2 authentication for sudo and polkit
+# leenium:args=[--remove]
+# leenium:requires-sudo=true
+
 set -e
 
 GREEN='\033[0;32m'

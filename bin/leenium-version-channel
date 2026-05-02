@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# leenium:summary=Print the active Leemium mirror and package channel
+
 if grep -q "https://pkgs.leenium.org/stable/" /etc/pacman.conf; then
   echo "stable"
 else

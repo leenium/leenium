@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Overwrite the user configs for the Walker application launcher (which also powers the Leenium Menu) and restart the services.
+# leenium:summary=Overwrite the user configs for the Walker application launcher (which also powers the Leemium Menu) and restart the services.
 
-# Ensure walker is set to autostart
 mkdir -p ~/.config/autostart/
 cp "$LEENIUM_PATH/default/walker/walker.desktop" ~/.config/autostart/
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Returns drive information about a given volumne, like /dev/nvme0, which is used by leenium-drive-select.
+# leenium:summary=Print drive information such as size, model, and mount details
+# leenium:args=<drive>
 
 if (($# == 0)); then
   echo "Usage: leenium-drive-info [/dev/drive]"

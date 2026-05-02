@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Install one of the supported development environments. Usually called via Install > Development > * in the Leenium Menu.
+# leenium:summary=Install a supported development environment
+# leenium:name=dev-env
+# leenium:args=<ruby|node|bun|deno|go|laravel|symfony|php|python|elixir|phoenix|rust|java|zig|ocaml|dotnet|clojure|scala>
+# leenium:examples=leenium install dev-env ruby | leenium install dev-env node
+# leenium:requires-sudo=true
 
 if [[ -z $1 ]]; then
   echo "Usage: leenium-install-dev-env <ruby|node|bun|deno|go|laravel|symfony|php|python|elixir|phoenix|rust|java|zig|ocaml|dotnet|clojure|scala>" >&2

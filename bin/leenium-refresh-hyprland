@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Overwrite all the user configs in ~/.config/hypr with the Leenium defaults.
+# leenium:summary=Overwrite all the user configs in ~/.config/hypr with the Leemium defaults.
 
 leenium-refresh-config hypr/autostart.conf
 leenium-refresh-config hypr/bindings.conf

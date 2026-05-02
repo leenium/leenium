@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# leenium:summary=Generate a theme's colors.toml from its alacritty.toml palette
+# leenium:args=<theme-dir>
+
 set -e
 
 THEME_SOURCE="${1:-}"

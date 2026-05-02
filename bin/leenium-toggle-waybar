@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# leenium:summary=Toggle Waybar visibility
+# leenium:examples=leenium toggle waybar
+
 leenium-toggle waybar-off
 
 if pgrep -x waybar >/dev/null; then

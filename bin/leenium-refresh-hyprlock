@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Overwrite the user config for hyprlock with the Leenium default.
+# leenium:summary=Overwrite the user config for hyprlock with the Leemium default.
 
 leenium-refresh-config hypr/hyprlock.conf

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Remove all web apps installed via leenium-webapp-install.
-# Identifies web apps by their Exec pattern (leenium-launch-webapp or leenium-webapp-handler).
+# leenium:summary=Remove all web apps installed via leenium-webapp-install.
 
 set -e
 

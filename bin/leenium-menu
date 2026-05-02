@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Launch the Leenium Menu or takes a parameter to jump straight to a submenu.
+# leenium:summary=Launch the Leenium Menu or takes a parameter to jump straight to a submenu.
 
 # Set to true when going directly to a submenu, so we can exit directly
 BACK_TO_EXIT=false
@@ -296,6 +296,10 @@ show_hardware_menu() {
     options="$options\n󰟸  Touchpad"
   fi
 
+   if leenium-hw-touchscreen; then
+    options="$options\n󰆽  Touchscreen"
+  fi
+
   case $(menu "Toggle" "$options") in
 
   "$MENU_BACK") show_settings_menu ;;
@@ -303,6 +307,7 @@ show_hardware_menu() {
   *Laptop*) leenium-hyprland-monitor-internal toggle ;;
   *Mirror*) leenium-hyprland-monitor-internal-mirror toggle;;
   *Touchpad*) leenium-toggle-touchpad ;;
+  *Touchscreen*) leenium-toggle-touchscreen ;;
   *"Hybrid GPU"*) present_terminal leenium-toggle-hybrid-gpu ;;
   *) back_to show_trigger_menu ;;
   esac
@@ -730,10 +735,9 @@ show_remove_elixir_menu() {
 }
 
 show_update_menu() {
-  case $(menu "Update" "  Leenium\n󱋡  History\n󰁯  Rollback\n󰸌  Extra Themes\n  Firmware") in
+  case $(menu "Update" "  Leenium\n󱋡  History\n󰸌  Extra Themes\n  Firmware") in
   *Leenium*) present_terminal leenium-update ;;
   *History*) present_terminal leenium-update-history ;;
-  *Rollback*) present_terminal leenium-rollback ;;
   *Themes*) present_terminal leenium-theme-update ;;
   *Firmware*) present_terminal leenium-update-firmware ;;
   *) show_main_menu ;;

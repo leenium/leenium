@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Manage persistent state files for Leenium toggles and settings.
-# Usage: leenium-state <set|clear> <state-name-or-pattern>
-# Used to track whether features like suspend, idle lock, etc are enabled or disabled.
+# leenium:summary=Manage persistent state files for Leemium toggles and settings.
+# leenium:args=<set|clear> <state-name-or-pattern>
 
 STATE_DIR="$HOME/.local/state/leenium"
 mkdir -p "$STATE_DIR"

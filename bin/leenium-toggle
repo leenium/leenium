@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Toggle Leenium features between enabled and disabled
+# leenium:summary=Toggle Leemium features between enabled and disabled
+# leenium:args=[--enabled-notification <text>] [--disabled-notification <text>] <flag-name>
 
 ENABLED_NOTIFICATION=""
 DISABLED_NOTIFICATION=""

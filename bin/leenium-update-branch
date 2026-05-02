@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# leenium:summary=Switch Leemium branches and update from the selected branch
+# leenium:args=<branch>
+
 set -e
 LEENIUM_PATH=${LEENIUM_PATH:-$HOME/.local/share/leenium}
 

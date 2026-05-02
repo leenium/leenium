@@ -1,3 +1,5 @@
 #!/bin/bash
 
+# leenium:summary=Print the current Leemium git branch
+
 echo $(git -C "$LEENIUM_PATH" rev-parse --abbrev-ref HEAD)
