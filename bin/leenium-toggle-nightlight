@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Default temperature values
+# leenium:summary=Toggle nightlight screen temperature
+# leenium:examples=leenium toggle nightlight
+
 ON_TEMP=4000
 OFF_TEMP=6000
 

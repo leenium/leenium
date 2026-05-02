@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Reload opencode configuration (used by the Leenium theme switching).
+# leenium:summary=Reload opencode configuration (used by the Leemium theme switching).
 
 if pgrep -x opencode >/dev/null; then
   killall -SIGUSR2 opencode

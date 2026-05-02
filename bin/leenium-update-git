@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# leenium:summary=Pull the latest Leemium git changes
+
 set -e
 
 echo -e "\e[32mUpdate Leenium\e[0m"

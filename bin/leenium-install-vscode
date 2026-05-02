@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install VSCode and configure it to use the gnome-libsecret password store, not to update automatically, and to use the current Leenium theme.
+# leenium:summary=Install VS Code and configure Leemium defaults for secrets, updates, and theme
 
 echo "Installing VSCode..."
 leenium-pkg-aur-add visual-studio-code-bin

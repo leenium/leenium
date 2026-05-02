@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# leenium:summary=Update Leemium and system packages
+# leenium:args=[-y]
+# leenium:examples=leenium update | leenium update -y
+# leenium:requires-sudo=true
+
 set -e
 
 # Run the update inside a PTY so pacman/yay keep showing download progress

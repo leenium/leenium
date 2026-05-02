@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Restart the XCompose input method service (fcitx5) to apply new compose key settings.
+# leenium:summary=Restart the XCompose input method service (fcitx5) to apply new compose key settings.
 
 leenium-restart-app fcitx5 --disable notificationitem

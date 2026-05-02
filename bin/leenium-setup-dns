@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# leenium:summary=Configure the system DNS provider
+# leenium:args=[Cloudflare|Google|DHCP|Custom]
+# leenium:requires-sudo=true
+
 lock_dns_to_resolved() {
   for file in /etc/systemd/network/*.network; do
     [[ -f $file ]] || continue

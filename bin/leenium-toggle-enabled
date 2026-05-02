@@ -1,4 +1,6 @@
 #!/bin/bash
 
-# Check if a toggle is enabled (flag file exists)
+# leenium:summary=Check if a toggle is enabled (flag file exists)
+# leenium:args=<flag-name>
+
 [[ -f "$HOME/.local/state/leenium/toggles/$1" ]]

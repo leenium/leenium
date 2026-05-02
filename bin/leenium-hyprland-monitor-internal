@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# leenium:summary=Enable, disable, toggle, or recover the internal laptop display
+# leenium:args=<on|off|toggle|recover>
+
 TOGGLE="internal-monitor-disable"
 TOGGLE_FLAG="$HOME/.local/state/leenium/toggles/hypr/$TOGGLE.conf"
 MIRROR_TOGGLE="internal-monitor-mirror"
@@ -18,7 +21,7 @@ disable() {
     notify-send -u low "󰍹    Can't disable the only active display"
     exit 1
   fi
-  if omarchy-hyprland-toggle-disabled "$TOGGLE" && omarchy-hyprland-toggle-disabled "$MIRROR_TOGGLE"; then
+  if leenium-hyprland-toggle-disabled "$TOGGLE" && leenium-hyprland-toggle-disabled "$MIRROR_TOGGLE"; then
     echo "monitor=$INTERNAL,disable" >"$TOGGLE_FLAG"
     notify-send -u low "󰍹    Laptop display disabled"
     hyprctl reload

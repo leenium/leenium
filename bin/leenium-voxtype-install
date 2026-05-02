@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# leenium:summary=Install and configure Voxtype dictation
+# leenium:requires-sudo=true
+
 set -e
 
 # Install voxtype and configure it for use.

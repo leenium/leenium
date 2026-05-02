@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Overwrite the user config for the Limine bootloader and rebuild it.
+# leenium:summary=Overwrite the user config for the Limine bootloader and rebuild it.
+# leenium:requires-sudo=true
 
 MACHINE_ID=$(cat /etc/machine-id 2>/dev/null || true)
 if [[ -n $MACHINE_ID ]] && [[ -f /boot/EFI/Linux/leenium_linux.efi ]] && [[ -f "/boot/EFI/Linux/${MACHINE_ID}_linux.efi" ]]; then

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Install the NordVPN service with optional GUI.
+# leenium:summary=Install the NordVPN service with optional GUI.
+# leenium:requires-sudo=true
 
 echo "Installing NordVPN..."
 leenium-pkg-aur-add nordvpn-bin

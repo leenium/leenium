@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Set the branch for Leenium's git repository.
+# leenium:summary=Set the branch for Leemium's git repository.
+# leenium:args=<master|rc|dev>
 
 if (($# == 0)); then
   echo "Usage: leenium-branch-set master"

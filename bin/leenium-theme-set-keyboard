@@ -1,4 +1,6 @@
 #!/bin/bash
 
+# leenium:summary=Apply the current theme keyboard color to supported keyboards
+
 leenium-theme-set-keyboard-asus-rog
 leenium-theme-set-keyboard-f16

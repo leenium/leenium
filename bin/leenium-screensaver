@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run the Leenium screensaver using random effects from TTE.
+# leenium:summary=Run the Leemium screensaver using random effects from TTE.
 
 screensaver_in_focus() {
   hyprctl activewindow -j | jq -e '.class == "org.leenium.screensaver"' >/dev/null 2>&1
