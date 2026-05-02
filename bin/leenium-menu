@@ -509,7 +509,7 @@ show_install_editor_menu() {
   *VSCode*) present_terminal leenium-install-vscode ;;
   *Cursor*) aur_install_and_launch "Cursor" "cursor-bin" "cursor" ;;
   *Zed*) install_and_launch "Zed" "zed" "dev.zed.Zed" ;;
-  *Helix*) install "Helix" "helix" ;;
+  *Helix*) present_terminal leenium-install-helix ;;
   *Emacs*) install "Emacs" "emacs-wayland" && systemctl --user enable --now emacs.service ;;
   *) show_install_menu ;;
   esac

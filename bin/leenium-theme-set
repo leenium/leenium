@@ -57,6 +57,7 @@ leenium-restart-hyprctl
 leenium-restart-btop
 leenium-restart-opencode
 leenium-restart-mako
+leenium-restart-helix
 
 # Change app-specific themes
 leenium-theme-set-gnome
