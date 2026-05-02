@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Overwrite the user configs for the Waybar menu bar with the Leenium defaults and restart the service.
+# leenium:summary=Reset Waybar config to Leemium defaults
+# leenium:examples=leenium refresh waybar
 
 leenium-refresh-config waybar/config.jsonc
 leenium-refresh-config waybar/style.css

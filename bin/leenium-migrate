@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Run all pending migrations to bring the system in line with the installed version.
-# Leenium 1.0.0 is the baseline; only migrations created after that point should exist.
+# leenium:summary=Run all pending migrations to bring the system in line with the installed version.
 
 shopt -s nullglob
 

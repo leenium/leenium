@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# leenium:summary=Toggle microphone mute. Dell XPS and ThinkPad systems get special handling for the hardware LED.
+
+if leenium-hw-match "XPS"; then
+  leenium-audio-input-mute-xps
+elif leenium-hw-match "ThinkPad"; then
+  leenium-audio-input-mute-thinkpad
+else
+  leenium-swayosd-client --input-volume mute-toggle
+fi

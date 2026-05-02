@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# Locks the system using hyprlock, and stops the screensaver first.
+# leenium:summary=Lock the screen
+# leenium:group=system
+# leenium:name=lock
+# leenium:examples=leenium system lock
 
-# Lock the screen
 pidof hyprlock || hyprlock >/dev/null 2>&1 &
 
 # Set keyboard layout to default (first layout)

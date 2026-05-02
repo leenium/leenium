@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Returns true if all of the named packages are installed on the system (or false if any of them are missing).
+# leenium:summary=Returns true if all of the named packages are installed on the system (or false if any of them are missing).
+# leenium:args=<packages...>
 
 for pkg in "$@"; do
   pacman -Q "$pkg" &>/dev/null || exit 1

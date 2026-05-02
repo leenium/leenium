@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# leenium:summary=Show current theme
+# leenium:examples=leenium theme current
+
 THEME_NAME_PATH="$HOME/.config/leenium/current/theme.name"
 
 if [[ -f "$THEME_NAME_PATH" ]]; then

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# leenium:summary=Generate themed config files from Leemium templates
+
 TEMPLATES_DIR="$LEENIUM_PATH/default/themed"
 USER_TEMPLATES_DIR="$HOME/.config/leenium/themed"
 NEXT_THEME_DIR="$HOME/.config/leenium/current/next-theme"

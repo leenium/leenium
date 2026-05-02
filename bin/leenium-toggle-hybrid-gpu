@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Toggle dedicated vs integrated GPU mode via supergfxd (for hybrid gpu laptops, like Asus G14).
-# Requires reboot to take effect.
+# leenium:summary=Toggle dedicated vs integrated GPU mode via supergfxd (for hybrid gpu laptops, like Asus G14).
+# leenium:requires-sudo=true
 
 # Ensure supergfxctl has been installed
 if leenium-cmd-missing supergfxctl; then

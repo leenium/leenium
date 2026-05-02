@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Show recent Leenium update and rollback history.
+# Show recent Leenium update history.
 
 STATE_DIR="$HOME/.local/state/leenium"
 HISTORY_FILE="$STATE_DIR/update-history.tsv"

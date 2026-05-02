@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# leenium:summary=Set the Plymouth boot theme from an Leemium theme
+# leenium:args=<theme-name>
+# leenium:requires-sudo=true
+
 # Resolve a theme by name and apply its unlock.png + colors.toml as the
 # Plymouth boot screen via leenium-plymouth-set.
 

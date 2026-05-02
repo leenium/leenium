@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Match Dell XPS systems with LG OLED panel on Intel Panther Lake (Xe3) GPU.
+# leenium:summary=Match Dell XPS systems with LG OLED panel on Intel Panther Lake (Xe3) GPU.
 
 leenium-hw-match "XPS" \
   && leenium-hw-intel-ptl \

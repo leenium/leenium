@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Sets the specified image as the current background
+# leenium:summary=Set the current background image
+# leenium:args=<path-to-image>
+# leenium:examples=leenium theme bg set ~/Pictures/wallpaper.png
 
 if [[ -z $1 ]]; then
   echo "Usage: leenium-theme-bg-set <path-to-image>" >&2

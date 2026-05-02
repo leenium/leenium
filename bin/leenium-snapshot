@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# leenium:summary=Create or restore system snapshots with snapper
+# leenium:args=<create|restore>
+# leenium:requires-sudo=true
+
 set -e
 
 COMMAND="$1"
@@ -44,6 +48,8 @@ create)
 
   for config in "${CONFIGS[@]}"; do
     snapshot_id=$(sudo snapper -c "$config" create -c number -d "$DESC" -p)
+    snapshot_id=$(sudo snapper -c "$config" cleanup number)
+
     SNAPSHOT_IDS+=("$config:$snapshot_id")
 
     if [[ $IDS_ONLY != "true" ]]; then

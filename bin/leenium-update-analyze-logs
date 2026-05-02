@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# leenium:summary=Check the update log for known failure conditions
+
 update_log="/tmp/leenium-update.log"
 
 # Check for initramfs generation failure

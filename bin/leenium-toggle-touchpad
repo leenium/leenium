@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# leenium:summary=Enable, disable, or toggle the touchpad
+# leenium:args=[on|off|toggle]
+
 STATE_CONF="$HOME/.local/state/leenium/toggles/hypr/touchpad-disabled.conf"
 
 device="$(leenium-hw-touchpad)"

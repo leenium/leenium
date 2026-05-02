@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Toggle microphone mute on ThinkPad systems. Uses wpctl for reliable toggling
-# and syncs the platform::micmute LED via brightnessctl.
+# leenium:summary=Toggle microphone mute on ThinkPad systems. Uses wpctl for reliable toggling
 
 wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle >/dev/null
 
@@ -17,7 +16,6 @@ fi
 
 brightnessctl --device="platform::micmute" set "$led_value" >/dev/null 2>&1 || true
 
-swayosd-client \
-  --monitor "$(leenium-hyprland-monitor-focused)" \
+leenium-swayosd-client \
   --custom-message "$osd_message" \
   --custom-icon "$osd_icon"

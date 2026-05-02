@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Install one of the approved terminals and set it as the default for Leenium (Super + Return etc).
+# leenium:summary=Install one of the approved terminals and set it as the default for Leemium (Super + Return etc).
+# leenium:args=<alacritty|ghostty|kitty>
+# leenium:requires-sudo=true
 
 if (($# == 0)); then
   echo "Usage: leenium-install-terminal [alacritty|ghostty|kitty]"

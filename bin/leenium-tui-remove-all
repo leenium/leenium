@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Remove all TUIs installed via leenium-tui-install.
-# Identifies TUIs by their Exec pattern (xdg-terminal-exec --app-id=TUI.).
+# leenium:summary=Remove all TUIs installed via leenium-tui-install.
 
 set -e
 

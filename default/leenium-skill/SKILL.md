@@ -107,7 +107,7 @@ cat $(which leenium-theme-set)
 | `leenium-theme-*` | Theme management | `leenium-theme-set <name>` |
 | `leenium-install-*` | Install optional software | `leenium-install-docker-dbs` |
 | `leenium-launch-*` | Launch apps | `leenium-launch-browser` |
-| `leenium-cmd-*` | System commands | `leenium-cmd-screenshot` |
+| `leenium-cmd-*` | System commands | `leenium-capture-screenshot` |
 | `leenium-pkg-*` | Package management | `leenium-pkg-install <pkg>` |
 | `leenium-setup-*` | Initial setup tasks | `leenium-setup-fingerprint` |
 | `leenium-update-*` | System updates | `leenium-update` |
@@ -307,7 +307,7 @@ leenium-font-set <name>         # Change font
 leenium-update                  # Full system update
 leenium-version                 # Show Leenium version
 leenium-debug --no-sudo --print # Debug info (ALWAYS use these flags)
-leenium-lock-screen             # Lock screen
+leenium-system-lock             # Lock screen
 leenium-system-shutdown         # Shutdown
 leenium-system-reboot           # Reboot
 ```

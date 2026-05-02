@@ -1,2 +1,5 @@
 #!/bin/bash
+
+# leenium:summary=Print the installed Leemium version
+
 cat "$LEENIUM_PATH/version"

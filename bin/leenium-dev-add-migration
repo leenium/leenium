@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Creates a new Leenium migration named after the unix timestamp of the last commit.
-# Only intended for Leenium developers.
+# leenium:summary=Creates a new Leemium migration named after the unix timestamp of the last commit.
 
 cd ~/.local/share/leenium
 mkdir -p "$HOME/.local/share/leenium/migrations"

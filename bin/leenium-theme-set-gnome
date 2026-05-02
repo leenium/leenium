@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Change gnome modes
+# leenium:summary=Apply the current theme to GNOME color mode and icon settings
+
 if [[ -f ~/.config/leenium/current/theme/light.mode ]]; then
   gsettings set org.gnome.desktop.interface color-scheme "prefer-light"
   gsettings set org.gnome.desktop.interface gtk-theme "Adwaita"

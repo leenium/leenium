@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Display brightness level using SwayOSD on the current monitor.
-# Usage: leenium-swayosd-brightness <percent>
+# leenium:summary=Display brightness level using SwayOSD on the current monitor.
+# leenium:args=<percent>
 
 percent="$1"
 

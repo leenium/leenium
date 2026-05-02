@@ -7,7 +7,7 @@
 #
 # show_system_menu() {
 #   case $(menu "System" "  Lock\n󰐥  Shutdown") in
-#   *Lock*) leenium-lock-screen ;;
+#   *Lock*) leenium-system-lock ;;
 #   *Shutdown*) leenium-system-shutdown ;;
 #   *) back_to show_main_menu ;;
 #   esac

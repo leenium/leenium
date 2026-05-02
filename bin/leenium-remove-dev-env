@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Remove a development environment that was previously installed via leenium-install-dev-env.
-# Usage: leenium-remove-dev-env <ruby|node|bun|deno|go|php|laravel|symfony|python|elixir|phoenix|zig|rust|java|dotnet|ocaml|clojure|scala>
+# leenium:summary=Remove a development environment that was previously installed via leenium-install-dev-env.
+# leenium:args=<ruby|node|bun|deno|go|php|laravel|symfony|python|elixir|phoenix|zig|rust|java|dotnet|ocaml|clojure|scala>
+# leenium:requires-sudo=true
 
 if [[ -z $1 ]]; then
   echo "Usage: leenium-remove-dev-env <ruby|node|bun|deno|go|php|laravel|symfony|python|elixir|phoenix|zig|rust|java|dotnet|ocaml|clojure|scala>" >&2

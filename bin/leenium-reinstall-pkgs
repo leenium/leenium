@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# leenium:summary=Reinstall all default Leemium packages from the stable channel
+# leenium:requires-sudo=true
+
 set -e
 
 # Reinstall all default Leenium packages from the stable channel and downgrade any packages that are too new.

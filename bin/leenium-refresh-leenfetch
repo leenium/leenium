@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Overwrite the user config for leenfetch with the Leenium default.
+# leenium:summary=Overwrite the user config for leenfetch with the Leemium default.
 
 leenium-refresh-config leenfetch/config.jsonc

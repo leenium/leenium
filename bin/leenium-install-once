@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Install the ONCE service, enable its background service, and launch the TUI.
+# leenium:summary=Install the ONCE service, enable its background service, and launch the TUI.
+# leenium:requires-sudo=true
 
 echo "Installing ONCE..."
 leenium-pkg-aur-add once-bin

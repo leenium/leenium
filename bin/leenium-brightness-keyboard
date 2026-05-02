@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Adjust keyboard backlight brightness using available steps.
-# Usage: leenium-brightness-keyboard <up|down|cycle>
+# leenium:summary=Adjust keyboard backlight brightness using available steps.
+# leenium:args=<up|down|cycle>
 
 direction="${1:-up}"
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Display keyboard brightness level using SwayOSD on the current monitor.
-# Usage: leenium-swayosd-kbd-brightness <percent>
+# leenium:summary=Display keyboard brightness level using SwayOSD on the current monitor.
+# leenium:args=<percent>
 
 percent="$1"
 

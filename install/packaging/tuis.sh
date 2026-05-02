@@ -2,3 +2,4 @@ ICON_DIR="$HOME/.local/share/applications/icons"
 
 leenium-tui-install "Disk Usage" "bash -c 'dust -r; read -n 1 -s'" float "$ICON_DIR/Disk Usage.png"
 leenium-tui-install "Docker" "lazydocker" tile "$ICON_DIR/Docker.png"
+leenium-tui-install "Cliamp" "cliamp" tile "$ICON_DIR/Cliamp.png"

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Finish the installation of Leenium with items that can only be done after logging in.
+# leenium:summary=Finish the installation of Leemium with items that can only be done after logging in.
+# leenium:requires-sudo=true
 
 set -e
 
