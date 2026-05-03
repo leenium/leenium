@@ -6,9 +6,18 @@
 TOGGLE="internal-monitor-disable"
 TOGGLE_FLAG="$HOME/.local/state/leenium/toggles/hypr/$TOGGLE.conf"
 MIRROR_TOGGLE="internal-monitor-mirror"
+HYPR_CONF="$HOME/.config/hypr/hyprland.conf"
 
 # Get internal monitor name dynamically
 INTERNAL=$(hyprctl monitors -j | jq -r '.[] | select(.name | contains("eDP")).name' | head -n 1)
+
+ensure_toggle_source_enabled() {
+  if ! grep -Eq '^[[:space:]]*source[[:space:]]*=[[:space:]]*~/.local/state/leenium/toggles/hypr/\*\.conf([[:space:]]*(#.*)?)?$' "$HYPR_CONF"; then
+    notify-send -u normal "󰍹    Toggle source missing in hyprland.conf"
+    echo "Missing required source line in $HYPR_CONF: source = ~/.local/state/leenium/toggles/hypr/*.conf" >&2
+    exit 1
+  fi
+}
 
 enable() {
   if leenium-hyprland-toggle-enabled "$TOGGLE"; then
@@ -35,10 +44,10 @@ recover() {
 }
 
 case "$1" in
-  on) enable ;;
-  off) disable ;;
-  toggle) if leenium-hyprland-toggle-enabled "$TOGGLE"; then enable; else disable; fi ;;
-  recover) recover ;;
+  on) ensure_toggle_source_enabled; enable ;;
+  off) ensure_toggle_source_enabled; disable ;;
+  toggle) ensure_toggle_source_enabled; if leenium-hyprland-toggle-enabled "$TOGGLE"; then enable; else disable; fi ;;
+  recover) ensure_toggle_source_enabled; recover ;;
   *)
     echo "Usage: $(basename "$0") {on|off|toggle|recover}" >&2
     exit 1

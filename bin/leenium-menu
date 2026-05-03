@@ -184,11 +184,12 @@ show_connectivity_menu() {
 }
 
 show_capture_menu() {
-  case $(menu "Capture" "  Screenshot\n  Screenrecord\n󰃉  Color") in
+  case $(menu "Capture" "  Screenshot\n  Screenrecord\n󰴑  Text Extraction\n󰃉  Color") in
   "$MENU_BACK") back_to show_action_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Screenshot*) leenium-capture-screenshot ;;
   *Screenrecord*) show_screenrecord_menu ;;
+  *Text*) leenium-capture-text-extraction ;;
   *Color*) pkill hyprpicker || hyprpicker -a ;;
   *) back_to show_action_menu ;;
   esac
@@ -260,7 +261,7 @@ show_share_menu() {
 }
 
 show_toggle_menu() {
-  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display\n󰟵  Passwordless Sudo"
+  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\nn󰂛  Notifications\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display\n󰟵  Passwordless Sudo"
 
   if [[ -n "$(leenium-hw-touchpad)" ]]; then
     options="$options\n󰟸  Touchpad"
@@ -272,6 +273,7 @@ show_toggle_menu() {
   *Screensaver*) leenium-toggle-screensaver ;;
   *Nightlight*) leenium-toggle-nightlight ;;
   *Idle*) leenium-toggle-idle ;;
+  *Notifications*) leenium-toggle-notification-silencing ;;
   *Bar*) leenium-toggle-waybar ;;
   *Layout*) leenium-hyprland-workspace-layout-toggle ;;
   *Ratio*) leenium-hyprland-window-single-square-aspect-toggle ;;
@@ -566,12 +568,12 @@ show_install_style_menu() {
 }
 
 show_install_font_menu() {
-  case $(menu "Install" "  Cascadia Mono\n  Meslo LG Mono\n  Fira Code\n  Victor Code\n  Bistream Vera Mono\n  Iosevka" "--width 350") in
+  case $(menu "Install" "  Cascadia Mono\n  Meslo LG Mono\n  Fira Code\n  Victor Code\n  Bitstream Vera Mono\n  Iosevka" "--width 350") in
   *Cascadia*) install_font "Cascadia Mono" "ttf-cascadia-mono-nerd" "CaskaydiaMono Nerd Font" ;;
   *Meslo*) install_font "Meslo LG Mono" "ttf-meslo-nerd" "MesloLGL Nerd Font" ;;
   *Fira*) install_font "Fira Code" "ttf-firacode-nerd" "FiraCode Nerd Font" ;;
   *Victor*) install_font "Victor Code" "ttf-victor-mono-nerd" "VictorMono Nerd Font" ;;
-  *Bistream*) install_font "Bistream Vera Code" "ttf-bitstream-vera-mono-nerd" "BitstromWera Nerd Font" ;;
+  *Bitstream*) install_font "Bitstream Vera Code" "ttf-bitstream-vera-mono-nerd" "BitstromWera Nerd Font" ;;
   *Iosevka*) install_font "Iosevka" "ttf-iosevka-nerd" "Iosevka Nerd Font Mono" ;;
   *) show_install_menu ;;
   esac
