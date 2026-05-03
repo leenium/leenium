@@ -184,11 +184,12 @@ show_connectivity_menu() {
 }
 
 show_capture_menu() {
-  case $(menu "Capture" "  Screenshot\n  Screenrecord\n󰃉  Color") in
+  case $(menu "Capture" "  Screenshot\n  Screenrecord\n󰴑  Text Extraction\n󰃉  Color") in
   "$MENU_BACK") back_to show_action_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Screenshot*) leenium-capture-screenshot ;;
   *Screenrecord*) show_screenrecord_menu ;;
+  *Text*) leenium-capture-text-extraction ;;
   *Color*) pkill hyprpicker || hyprpicker -a ;;
   *) back_to show_action_menu ;;
   esac
@@ -260,7 +261,7 @@ show_share_menu() {
 }
 
 show_toggle_menu() {
-  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display\n󰟵  Passwordless Sudo"
+  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\nn󰂛  Notifications\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display\n󰟵  Passwordless Sudo"
 
   if [[ -n "$(leenium-hw-touchpad)" ]]; then
     options="$options\n󰟸  Touchpad"
@@ -272,6 +273,7 @@ show_toggle_menu() {
   *Screensaver*) leenium-toggle-screensaver ;;
   *Nightlight*) leenium-toggle-nightlight ;;
   *Idle*) leenium-toggle-idle ;;
+  *Notifications*) leenium-toggle-notification-silencing ;;
   *Bar*) leenium-toggle-waybar ;;
   *Layout*) leenium-hyprland-workspace-layout-toggle ;;
   *Ratio*) leenium-hyprland-window-single-square-aspect-toggle ;;
