@@ -547,11 +547,12 @@ show_install_ai_menu() {
 }
 
 show_install_gaming_menu() {
-  case $(menu "Install" "  Steam\n  Lutris\n󰢹  NVIDIA GeForce NOW\n  RetroArch [AUR]\n󰍳  Minecraft [AUR]\n󰖺  Xbox Controller [AUR]") in
+  case $(menu "Install" "  Battle.net\n  Steam\n  Lutris\n󰢹  NVIDIA GeForce NOW\n  RetroArch\n󰍳  Minecraft [AUR]\n󰖺  Xbox Controller [AUR]") in
+  *Battle.net*) present_terminal leenium-install-battlenet ;;
   *Steam*) present_terminal leenium-install-steam ;;
   *Lutris*) present_terminal leenium-install-lutris ;;
   *GeForce*) present_terminal leenium-install-geforce-now ;;
-  *RetroArch*) aur_install_and_launch "RetroArch" "retroarch retroarch-assets libretro libretro-fbneo" "com.libretro.RetroArch.desktop" ;;
+  *RetroArch*) present_terminal leenium-install-retroarch ;;
   *Minecraft*) aur_install_and_launch "Minecraft" "minecraft-launcher" "minecraft-launcher" ;;
   *Xbox*) present_terminal leenium-install-xbox-controllers ;;
   *) show_install_menu ;;

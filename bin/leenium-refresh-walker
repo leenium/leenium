@@ -16,5 +16,11 @@ leenium-refresh-config walker/config.toml
 leenium-refresh-config elephant/calc.toml
 leenium-refresh-config elephant/desktopapplications.toml
 
+# Link all elephant menus
+mkdir -p ~/.config/elephant/menus
+for menu in $LEENIUM_PATH/default/elephant/*.lua; do
+  ln -snf "$menu" ~/.config/elephant/menus/"$(basename "$menu")"
+done
+
 # Restart service
 leenium-restart-walker
