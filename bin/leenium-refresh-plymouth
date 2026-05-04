@@ -3,7 +3,7 @@
 # leenium:summary=Overwrite the user config for the Plymouth drive decryption and boot sequence with the Leemium default and rebuild it.
 # leenium:requires-sudo=true
 
-sudo cp ~/.local/share/leenium/default/plymouth/* /usr/share/plymouth/themes/leenium/
+sudo cp -r ~/.local/share/leenium/default/plymouth/* /usr/share/plymouth/themes/leenium/
 sudo plymouth-set-default-theme leenium
 
 if command -v limine-mkinitcpio &>/dev/null; then
