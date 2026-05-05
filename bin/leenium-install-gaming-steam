@@ -5,9 +5,9 @@
 
 set -e
 
+echo "Installing Steam..."
 leenium-pkg-add steam
-leenium-install-vulkan-lib32
-leenium-install-nvidia-lib32
+leenium-install-gaming-gpu-lib32
 
 echo ""
 echo "Steam will start automatically now. This might take a while..."
