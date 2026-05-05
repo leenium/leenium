@@ -1,4 +1,5 @@
 echo "Add cliamp music TUI player (Super+Shift+Alt+M)"
+MIGRATION_VERSION="1.2.0"
 
 if leenium-pkg-missing cliamp; then
   leenium-pkg-add cliamp
