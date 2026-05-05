@@ -129,11 +129,20 @@ aur_install_and_launch() {
 }
 
 show_learn_menu() {
-  case $(menu "Learn" "  Keybindings\n  Leenium\n  Hyprland\n󰣇  Arch\n  Neovim\n󱆃  Bash") in
+  local options="\
+    Keybindings\n
+    Leenium\n
+    Hyprland\n
+  󰣇  Arch\n
+    Neovim\n
+  󱆃  Bash
+  "
+
+  case $(menu "Learn" "$options") in
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Keybindings*) leenium-menu-keybindings ;;
-  *Leenium*) leenium-launch-webapp "https://leenium.org" ;;
+  *Leenium*) leenium-launch-webapp "https://leenium.org/manual/" ;;
   *Hyprland*) leenium-launch-webapp "https://wiki.hypr.land/" ;;
   *Arch*) leenium-launch-webapp "https://wiki.archlinux.org/title/Main_page" ;;
   *Bash*) leenium-launch-webapp "https://devhints.io/bash" ;;
@@ -143,7 +152,12 @@ show_learn_menu() {
 }
 
 show_action_menu() {
-  case $(menu "Actions" "  Capture\n  Share") in
+  local options="\
+    Capture\n
+    Share
+  "
+
+  case $(menu "Actions" "$options") in
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Capture*) show_capture_menu ;;
@@ -153,7 +167,14 @@ show_action_menu() {
 }
 
 show_network_tailscale_menu() {
-  case $(menu "Tailscale" "󰐊  Up\n󰓛  Down\n󰋼  Status\n󰞁  Nodes") in
+  local options="\
+  󰐊  Up\n
+  󰓛  Down\n
+  󰋼  Status\n
+  󰞁  Nodes
+  "
+
+  case $(menu "Tailscale" "$options") in
   "$MENU_BACK") show_connectivity_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Up*) run_network_cmd "sudo systemctl start tailscaled && sudo tailscale up --accept-routes && tailscale status" ;;
@@ -184,11 +205,19 @@ show_connectivity_menu() {
 }
 
 show_capture_menu() {
-  case $(menu "Capture" "  Screenshot\n  Screenrecord\n󰃉  Color") in
+  local options="\
+    Screenshot\n
+    Screenrecord\n
+  󰴑  Text Extraction\n
+  󰃉  Color
+  "
+
+  case $(menu "Capture" "$options") in
   "$MENU_BACK") back_to show_action_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Screenshot*) leenium-capture-screenshot ;;
   *Screenrecord*) show_screenrecord_menu ;;
+  *Text*) leenium-capture-text-extraction ;;
   *Color*) pkill hyprpicker || hyprpicker -a ;;
   *) back_to show_action_menu ;;
   esac
@@ -231,7 +260,15 @@ show_webcam_select_menu() {
 show_screenrecord_menu() {
   leenium-capture-screenrecording --stop-recording && exit 0
 
-  case $(menu "Screenrecord" "  With no audio\n  With desktop audio\n  With desktop + microphone audio\n  With desktop + microphone audio + webcam") in
+  local options="\
+    With no audio\n
+    With desktop audio\n
+    With desktop + microphone audio\n
+    With desktop + microphone audio + webcam
+  "
+
+  case $(menu "Screenrecord" "$options") in
+
   "$MENU_BACK") back_to show_capture_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *"With no audio") leenium-capture-screenrecording ;;
@@ -249,7 +286,13 @@ show_screenrecord_menu() {
 }
 
 show_share_menu() {
-  case $(menu "Share" "  Clipboard\n  File \n  Folder") in
+  local options="\
+    Clipboard\n
+    File \n
+    Folder
+  "
+
+  case $(menu "Share" "$options") in
   "$MENU_BACK") back_to show_action_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Clipboard*) leenium-menu-share clipboard ;;
@@ -260,7 +303,20 @@ show_share_menu() {
 }
 
 show_toggle_menu() {
-  local options="󱄄  Screensaver\n󰔎  Nightlight\n󱫖  Idle Lock\n󰍜  Top Bar\n󱂬  Workspace Layout\n  Window Gaps\n  1-Window Ratio\n󰍹  Monitor Scaling\n  Direct Boot\n󰛧  Laptop Display\n󰟵  Passwordless Sudo"
+  local options="\
+  󱄄  Screensaver\n
+  󰔎  Nightlight\n
+  󱫖  Idle Lock\n
+  󰂛  Notifications\n
+  󰍜  Top Bar\n
+  󱂬  Workspace Layout\n
+    Window Gaps\n
+    1-Window Ratio\n
+  󰍹  Monitor Scaling\n
+    Direct Boot\n
+  󰛧  Laptop Display\n
+  󰟵  Passwordless Sudo
+  "
 
   if [[ -n "$(leenium-hw-touchpad)" ]]; then
     options="$options\n󰟸  Touchpad"
@@ -272,6 +328,7 @@ show_toggle_menu() {
   *Screensaver*) leenium-toggle-screensaver ;;
   *Nightlight*) leenium-toggle-nightlight ;;
   *Idle*) leenium-toggle-idle ;;
+  *Notifications*) leenium-toggle-notification-silencing ;;
   *Bar*) leenium-toggle-waybar ;;
   *Layout*) leenium-hyprland-workspace-layout-toggle ;;
   *Ratio*) leenium-hyprland-window-single-square-aspect-toggle ;;
@@ -315,7 +372,18 @@ show_hardware_menu() {
 }
 
 show_appearance_menu() {
-  case $(menu "Appearance" "󰸌  Theme\n󰟵  Unlock\n  Font\n  Background\n  Hyprland\n󱄄  Screensaver\n  About") in
+  local options="\
+  󰸌  Theme\n
+  󰟵  Unlock\n
+    Font\n
+    Background\n
+    Hyprland\n
+  󱄄  Screensaver\n
+    About
+  "
+
+  case $(menu "Appearance" "$options") in
+
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Theme*) show_theme_menu ;;
@@ -323,10 +391,42 @@ show_appearance_menu() {
   *Font*) show_font_menu ;;
   *Background*) show_background_menu ;;
   *Hyprland*) open_in_editor ~/.config/hypr/looknfeel.conf ;;
-  *Screensaver*) open_in_editor ~/.config/leenium/branding/screensaver.txt ;;
+  *Screensaver*) show_screensaver_menu ;;
   *About*) open_in_editor ~/.config/leenium/branding/about.txt ;;
   *) show_main_menu ;;
   esac
+}
+
+show_screensaver_menu() {
+  local options="\
+    Set From Image\n
+    Restore Default\n
+    Edit Text\n
+  󱄄  Preview
+  "
+
+  case $(menu "Screensaver" "$options") in
+  
+  *Image*) set_screensaver_from_image ;;
+  *Default*) terminal bash -lc 'leenium-screensaver-set-logo default; echo; read -n 1 -s -r -p "Press any key to close..."' ;;
+  *Text*) open_in_editor ~/.config/leenium/branding/screensaver.txt ;;
+  *Preview*) leenium-launch-screensaver force ;;
+  *) show_style_menu ;;
+  esac
+}
+
+set_screensaver_from_image() {
+  terminal bash -lc '
+    image=$(fd --type file --ignore-case --extension svg --extension png . "$HOME" 2>/dev/null | fzf --prompt "Logo image> ")
+    if [[ -n $image ]]; then
+      if leenium-screensaver-set-logo "$image"; then
+        echo
+        echo "Preview with: leenium-launch-screensaver force"
+      fi
+      echo
+      read -n 1 -s -r -p "Press any key to close..."
+    fi
+  '
 }
 
 show_theme_menu() {
@@ -347,10 +447,21 @@ show_font_menu() {
 }
 
 show_settings_menu() {
-  local options="󰘦  Config\n󱌣  Maintenance\n  Audio\n  Connectivity\n󱐋  Power Profile\n  System Sleep"
-  options="$options\n󰍹  Monitors\n  Hardware\n󰱔  DNS\n  Security\n󰔎  Toggle"
-
+  local options="\
+   󰘦  Config\n
+   󰔎  Toggle\n
+   󱌣  Maintenance\n
+     Audio\n
+     Connectivity\n
+   󱐋  Power Profile\n
+     System Sleep\n
+   󰍹  Monitors\n
+     Hardware\n
+   󰱔  DNS\n
+     Security
+  "
   case $(menu "Settings" "$options") in
+
   "$MENU_BACK") show_main_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Config*) show_config_menu ;;
@@ -394,7 +505,12 @@ show_setup_power_menu() {
 }
 
 show_setup_security_menu() {
-  case $(menu "Security" "󰈷  Fingerprint\n  Fido2") in
+  local options="\
+   󰈷  Fingerprint\n
+     Fido2
+  "
+  case $(menu "Security" "$options") in
+
   "$MENU_BACK") show_settings_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Fingerprint*) present_terminal leenium-setup-fingerprint ;;
@@ -404,7 +520,19 @@ show_setup_security_menu() {
 }
 
 show_setup_config_menu() {
-  case $(menu "Config" "  Defaults\n  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n  Swayosd\n󰌧  Walker\n󰍜  Waybar\n󰞅  XCompose") in
+  local options="\
+     Defaults\n
+     Hyprland\n
+     Hypridle\n
+     Hyprlock\n
+     Hyprsunset\n
+     Swayosd\n
+   󰌧  Walker\n
+   󰍜  Waybar\n
+   󰞅  XCompose
+  "
+  case $(menu "Config" "$options") in
+
   "$MENU_BACK") show_config_menu ;;
   "$MENU_EXIT") exit 0 ;;
   *Defaults*) open_in_editor ~/.config/uwsm/default ;;
@@ -446,7 +574,22 @@ show_setup_system_menu() {
 }
 
 show_install_menu() {
-  case $(menu "Install" "󰣇  PACMAN\n󰣇  AUR\n  Web App\n  TUI\n  Service\n  Style\n󰵮  Development\n  Editor\n  Terminal\n󱚤  AI\n󰍲  Windows\n  Gaming") in
+  local options="\
+   󰣇  PACMAN\n
+   󰣇  AUR\n
+     Web App\n
+     TUI\n
+     Service\n
+     Style\n
+   󰵮  Development\n
+     Editor\n
+     Terminal\n
+   󱚤  AI\n
+   󰍲  Windows\n
+     Gaming
+  "
+  case $(menu "Install" "$options") in
+
   *PACMAN*) terminal leenium-pkg-install ;;
   *AUR*) terminal leenium-pkg-aur-install ;;
   *Web*) present_terminal leenium-webapp-install ;;
@@ -490,7 +633,17 @@ show_install_menu() {
 # }
 
 show_install_service_menu() {
-  case $(menu "Install" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account\n󰏖  ONCE [AUR]") in
+  local options="\
+     Tailscale\n
+   󱇱  NordVPN [AUR]\n
+     Telegram\n
+   󰭹  Signal\n
+     Discord\n
+     Chromium Account\n
+   󰏖  ONCE [AUR]
+  "
+  case $(menu "Install" "$options") in
+
   *Tailscale*) present_terminal leenium-install-tailscale ;;
   *NordVPN*) present_terminal leenium-install-nordvpn ;;
   # *Bitwarden*) install_and_launch "Bitwarden" "bitwarden bitwarden-cli" "bitwarden" ;;
@@ -505,18 +658,30 @@ show_install_service_menu() {
 }
 
 show_install_editor_menu() {
-  case $(menu "Install" "  VSCode\n  Cursor\n  Zed\n  Helix\n  Emacs") in
+  local options="\
+     VSCode\n
+     Cursor\n
+     Zed\n
+     Helix\n
+     Emacs
+  "
+  case $(menu "Install" "$options") in
   *VSCode*) present_terminal leenium-install-vscode ;;
   *Cursor*) aur_install_and_launch "Cursor" "cursor-bin" "cursor" ;;
   *Zed*) install_and_launch "Zed" "zed" "dev.zed.Zed" ;;
-  *Helix*) install "Helix" "helix" ;;
+  *Helix*) present_terminal leenium-install-helix ;;
   *Emacs*) install "Emacs" "emacs-wayland" && systemctl --user enable --now emacs.service ;;
   *) show_install_menu ;;
   esac
 }
 
 show_install_terminal_menu() {
-  case $(menu "Install" "  Alacritty\n  Ghostty\n  Kitty") in
+  local options="\
+     Alacritty\n
+     Ghostty\n
+     Kitty
+  "
+  case $(menu "Install" "$options") in
   *Alacritty*) install_terminal "alacritty" ;;
   *Ghostty*) install_terminal "ghostty" ;;
   *Kitty*) install_terminal "kitty" ;;
@@ -531,7 +696,18 @@ show_install_ai_menu() {
       echo ollama
   )
 
-  case $(menu "Install" "󱚤  Claude Code\n󱚤  Codex\n󱚤  Crush\n  Dictation\n󱚤  Gemini CLI\n󱚤  Ollama\n󱚤  OpenCode\n󱚤  LM Studio (AUR)") in
+  local options="\
+  󱚤  Claude Code\n
+  󱚤  Codex\n
+  󱚤  Crush\n
+    Dictation\n
+  󱚤  Gemini CLI\n
+  󱚤  Ollama\n
+  󱚤  OpenCode\n
+  󱚤  LM Studio (AUR)
+  "
+
+  case $(menu "Install" "$options") in
   *Claude*) present_terminal "leenium-install-dev-env claude-code" ;;
   *Codex*) present_terminal "leenium-install-dev-env codex" ;;
   *Crush*) present_terminal "leenium-install-dev-env crush" ;;
@@ -545,19 +721,41 @@ show_install_ai_menu() {
 }
 
 show_install_gaming_menu() {
-  case $(menu "Install" "  Steam\n  Lutris\n󰢹  NVIDIA GeForce NOW\n  RetroArch [AUR]\n󰍳  Minecraft [AUR]\n󰖺  Xbox Controller [AUR]") in
-  *Steam*) present_terminal leenium-install-steam ;;
-  *Lutris*) present_terminal leenium-install-lutris ;;
-  *GeForce*) present_terminal leenium-install-geforce-now ;;
-  *RetroArch*) aur_install_and_launch "RetroArch" "retroarch retroarch-assets libretro libretro-fbneo" "com.libretro.RetroArch.desktop" ;;
+  local options="\
+    Steam\n
+  󰢹  NVIDIA GeForce NOW\n
+    RetroArch\n
+  󰍳  Minecraft [AUR]\n
+    Xbox Cloud Gaming\n
+  󰖺  Xbox Controller (󰂯)\n
+    Lutris (Battle.net)\n
+  󱓟  Heroic (Epic Games)\n
+  󰍹  Moonlight (GameStream)
+  "
+
+case $(menu "Install" "$options") in
+
+  *Steam*) present_terminal leenium-install-gaming-steam ;;
+  *GeForce*) present_terminal leenium-install-gaming-geforce-now ;;
+  *RetroArch*) present_terminal leenium-install-gaming-retroarch ;;
   *Minecraft*) aur_install_and_launch "Minecraft" "minecraft-launcher" "minecraft-launcher" ;;
-  *Xbox*) present_terminal leenium-install-xbox-controllers ;;
+  *"Xbox Cloud"*) present_terminal leenium-install-gaming-xbox-cloud ;;
+  *Xbox*) present_terminal leenium-install-gaming-xbox-controllers ;;
+  *Lutris*) present_terminal leenium-install-gaming-lutris ;;
+  *Heroic*) present_terminal leenium-install-gaming-heroic ;;
+  *Moonlight*) present_terminal leenium-install-gaming-moonlight ;;
   *) show_install_menu ;;
   esac
 }
 
 show_install_style_menu() {
-  case $(menu "Install" "󰸌  Theme\n  Background\n  Font") in
+  local options="\
+  󰸌  Theme\n
+    Background\n
+    Font
+  "
+
+  case $(menu "Install" "$options") in
   *Theme*) present_terminal leenium-theme-install ;;
   *Background*) leenium-theme-bg-install ;;
   *Font*) show_install_font_menu ;;
@@ -566,19 +764,45 @@ show_install_style_menu() {
 }
 
 show_install_font_menu() {
-  case $(menu "Install" "  Cascadia Mono\n  Meslo LG Mono\n  Fira Code\n  Victor Code\n  Bistream Vera Mono\n  Iosevka" "--width 350") in
+  local options="\
+    Cascadia Mono\n
+    Meslo LG Mono\n
+    Fira Code\n
+    Victor Code\n
+    Bitstream Vera Mono\n
+    Iosevka
+  "
+  case $(menu "Install" "$options" "--width 350") in
+
   *Cascadia*) install_font "Cascadia Mono" "ttf-cascadia-mono-nerd" "CaskaydiaMono Nerd Font" ;;
   *Meslo*) install_font "Meslo LG Mono" "ttf-meslo-nerd" "MesloLGL Nerd Font" ;;
   *Fira*) install_font "Fira Code" "ttf-firacode-nerd" "FiraCode Nerd Font" ;;
   *Victor*) install_font "Victor Code" "ttf-victor-mono-nerd" "VictorMono Nerd Font" ;;
-  *Bistream*) install_font "Bistream Vera Code" "ttf-bitstream-vera-mono-nerd" "BitstromWera Nerd Font" ;;
+  *Bitstream*) install_font "Bitstream Vera Code" "ttf-bitstream-vera-mono-nerd" "BitstromWera Nerd Font" ;;
   *Iosevka*) install_font "Iosevka" "ttf-iosevka-nerd" "Iosevka Nerd Font Mono" ;;
   *) show_install_menu ;;
   esac
 }
 
 show_install_development_menu() {
-  case $(menu "Install" "  Clojure\n  Docker DB\n  Elixir\n  Go\n  Java\n  JavaScript\n  .NET\n  OCaml\n  PHP\n  Python\n󰫏  Ruby on Rails\n  Rust\n  Scala\n  Zig") in
+  local options="\
+    Clojure\n
+    Docker DB\n
+    Elixir\n
+    Go\n
+    Java\n
+    JavaScript\n
+    .NET\n
+    OCaml\n
+    PHP\n
+    Python\n
+  󰫏  Ruby on Rails\n
+    Rust\n
+    Scala\n
+    Zig
+  "
+
+  case $(menu "Install" "$options") in
   *Clojure*) present_terminal "leenium-install-dev-env clojure" ;;
   *Docker*) present_terminal leenium-install-docker-dbs ;;
   *Elixir*) show_install_elixir_menu ;;
@@ -598,7 +822,13 @@ show_install_development_menu() {
 }
 
 show_install_javascript_menu() {
-  case $(menu "Install" "  Node.js\n  Bun\n  Deno") in
+  local options="\
+    Node.js\n
+    Bun\n
+    Deno
+  "
+
+  case $(menu "Install" "$options") in
   *Node*) present_terminal "leenium-install-dev-env node" ;;
   *Bun*) present_terminal "leenium-install-dev-env bun" ;;
   *Deno*) present_terminal "leenium-install-dev-env deno" ;;
@@ -607,7 +837,13 @@ show_install_javascript_menu() {
 }
 
 show_install_php_menu() {
-  case $(menu "Install" "  PHP\n  Laravel\n  Symfony") in
+  local options="\
+    PHP\n
+    Laravel\n
+    Symfony
+  "
+
+  case $(menu "Install" "$options") in
   *PHP*) present_terminal "leenium-install-dev-env php" ;;
   *Laravel*) present_terminal "leenium-install-dev-env laravel" ;;
   *Symfony*) present_terminal "leenium-install-dev-env symfony" ;;
@@ -616,7 +852,12 @@ show_install_php_menu() {
 }
 
 show_install_elixir_menu() {
-  case $(menu "Install" "  Elixir\n  Phoenix") in
+  local options="\
+    Elixir\n
+    Phoenix
+  "
+
+  case $(menu "Install" "$options") in
   *Elixir*) present_terminal "leenium-install-dev-env elixir" ;;
   *Phoenix*) present_terminal "leenium-install-dev-env phoenix" ;;
   *) show_install_development_menu ;;
@@ -624,7 +865,25 @@ show_install_elixir_menu() {
 }
 
 show_remove_menu() {
-  case $(menu "Remove" "󰣇  Packages\n  Web App\n  TUI\n  Service\n󰏓  Preinstalls\n󰸌  Theme\n󰵮  Development\n  Editor\n  Terminal\n󱚤  AI\n󰍲  Windows\n󰈷  Fingerprint\n  Fido2") in
+  local options="\
+  󰣇  Packages\n
+    Web App\n
+    TUI\n
+    Service\n
+  󰏓  Preinstalls\n
+  󰸌  Theme\n
+  󰵮  Development\n
+    Gaming\n
+    Editor\n
+    Terminal\n
+  󱚤  AI\n
+  󰍲  Windows\n
+  󰈷  Fingerprint\n
+    Fido2
+  "
+
+  case $(menu "Remove" "$options") in
+
   *Packages*) terminal leenium-pkg-remove ;;
   *Web*) present_terminal leenium-webapp-remove ;;
   *TUI*) present_terminal leenium-tui-remove ;;
@@ -632,6 +891,7 @@ show_remove_menu() {
   *Preinstalls*) present_terminal leenium-remove-preinstalls ;;
   *Theme*) present_terminal leenium-theme-remove ;;
   *Development*) show_remove_development_menu ;;
+  *Gaming*) show_remove_gaming_menu ;;
   *Editor*) show_remove_editor_menu ;;
   *Terminal*) show_remove_terminal_menu ;;
   *AI*) show_remove_ai_menu ;;
@@ -642,8 +902,48 @@ show_remove_menu() {
   esac
 }
 
+show_remove_gaming_menu() {
+  local options="\
+    Steam\n
+  󰢹  NVIDIA GeForce NOW\n
+    RetroArch\n
+  󰍳  Minecraft [AUR]\n
+    Xbox Cloud Gaming\n
+  󰖺  Xbox Controller (󰂯)\n
+    Lutris (Battle.net)\n
+  󱓟  Heroic (Epic Games)\n
+  󰍹  Moonlight (GameStream)
+  "
+
+  case $(menu "Remove" "$options") in
+
+
+  *Steam*) present_terminal leenium-remove-gaming-steam ;;
+  *RetroArch*) present_terminal leenium-remove-gaming-retroarch ;;
+  *Minecraft*) present_terminal leenium-remove-gaming-minecraft ;;
+  *GeForce*) present_terminal leenium-remove-gaming-geforce-now ;;
+  *"Xbox Cloud"*) present_terminal leenium-remove-gaming-xbox-cloud ;;
+  *Xbox*) present_terminal leenium-remove-gaming-xbox-controllers ;;
+  *Lutris*) present_terminal leenium-remove-gaming-lutris ;;
+  *Heroic*) present_terminal leenium-remove-gaming-heroic ;;
+  *Moonlight*) present_terminal leenium-remove-gaming-moonlight ;;
+  *) show_remove_menu ;;
+  esac
+}
+
 show_remove_service_menu() {
-  case $(menu "Remove" "  Tailscale\n󱇱  NordVPN [AUR]\n  Telegram\n󰭹  Signal\n  Discord\n  Chromium Account\n󰏖  ONCE [AUR]") in
+  local options="\
+    Tailscale\n
+  󱇱  NordVPN [AUR]\n
+    Telegram\n
+  󰭹  Signal\n
+    Discord\n
+    Chromium Account\n
+  󰏖  ONCE [AUR]
+  "
+
+  case $(menu "Remove" "$options") in
+
   *Tailscale*) present_terminal "leenium-pkg-drop tailscale && leenium-webapp-remove Tailscale || true" ;;
   *NordVPN*) present_terminal "leenium-pkg-drop nordvpn-bin" ;;
   *Telegram*) present_terminal "leenium-pkg-drop telegram-desktop" ;;
@@ -656,7 +956,15 @@ show_remove_service_menu() {
 }
 
 show_remove_editor_menu() {
-  case $(menu "Remove" "  VSCode\n  Cursor\n  Zed\n  Helix\n  Emacs") in
+  local options="\
+    VSCode\n
+    Cursor\n
+    Zed\n
+    Helix\n
+    Emacs
+  "
+
+  case $(menu "Remove" "$options") in
   *VSCode*) present_terminal "leenium-pkg-drop visual-studio-code-bin code" ;;
   *Cursor*) present_terminal "leenium-pkg-drop cursor-bin" ;;
   *Zed*) present_terminal "leenium-pkg-drop zed" ;;
@@ -667,7 +975,13 @@ show_remove_editor_menu() {
 }
 
 show_remove_terminal_menu() {
-  case $(menu "Remove" "  Alacritty\n  Ghostty\n  Kitty") in
+  local options="\
+    Alacritty\n
+    Ghostty\n
+    Kitty
+  "
+
+  case $(menu "Remove" "$options") in
   *Alacritty*) present_terminal "leenium-pkg-drop alacritty" ;;
   *Ghostty*) present_terminal "leenium-pkg-drop ghostty" ;;
   *Kitty*) present_terminal "leenium-pkg-drop kitty" ;;
@@ -676,7 +990,18 @@ show_remove_terminal_menu() {
 }
 
 show_remove_ai_menu() {
-  case $(menu "Remove" "󱚤  Claude Code\n󱚤  Codex\n󱚤  Crush\n  Dictation\n󱚤  Gemini CLI\n󱚤  Ollama\n󱚤  OpenCode\n󱚤  LM Studio") in
+  local options="\
+  󱚤  Claude Code\n
+  󱚤  Codex\n
+  󱚤  Crush\n
+    Dictation\n
+  󱚤  Gemini CLI\n
+  󱚤  Ollama\n
+  󱚤  OpenCode\n
+  󱚤  LM Studio
+  "
+
+  case $(menu "Remove" "$options") in
   *Claude*) present_terminal "leenium-remove-dev-env claude-code" ;;
   *Codex*) present_terminal "leenium-remove-dev-env codex" ;;
   *Crush*) present_terminal "leenium-remove-dev-env crush" ;;
@@ -690,7 +1015,23 @@ show_remove_ai_menu() {
 }
 
 show_remove_development_menu() {
-  case $(menu "Remove" "  Clojure\n  Elixir\n  Go\n  Java\n  JavaScript\n  .NET\n  OCaml\n  PHP\n  Python\n󰫏  Ruby on Rails\n  Rust\n  Scala\n  Zig") in
+  local options="\
+    Clojure\n
+    Elixir\n
+    Go\n
+    Java\n
+    JavaScript\n
+    .NET\n
+    OCaml\n
+    PHP\n
+    Python\n
+  󰫏  Ruby on Rails\n
+    Rust\n
+    Scala\n
+    Zig
+  "
+
+  case $(menu "Remove" "$options") in
   *Clojure*) present_terminal "leenium-remove-dev-env clojure" ;;
   *Elixir*) show_remove_elixir_menu ;;
   *Go*) present_terminal "leenium-remove-dev-env go" ;;
@@ -709,7 +1050,13 @@ show_remove_development_menu() {
 }
 
 show_remove_javascript_menu() {
-  case $(menu "Remove" "  Node.js\n  Bun\n  Deno") in
+  local options="\
+    Node.js\n
+    Bun\n
+    Deno
+  "
+
+  case $(menu "Remove" "$options") in
   *Node*) present_terminal "leenium-remove-dev-env node" ;;
   *Bun*) present_terminal "leenium-remove-dev-env bun" ;;
   *Deno*) present_terminal "leenium-remove-dev-env deno" ;;
@@ -718,7 +1065,13 @@ show_remove_javascript_menu() {
 }
 
 show_remove_php_menu() {
-  case $(menu "Remove" "  PHP\n  Laravel\n  Symfony") in
+  local options="\
+    PHP\n
+    Laravel\n
+    Symfony
+  "
+
+  case $(menu "Remove" "$options") in
   *PHP*) present_terminal "leenium-remove-dev-env php" ;;
   *Laravel*) present_terminal "leenium-remove-dev-env laravel" ;;
   *Symfony*) present_terminal "leenium-remove-dev-env symfony" ;;
@@ -727,7 +1080,12 @@ show_remove_php_menu() {
 }
 
 show_remove_elixir_menu() {
-  case $(menu "Remove" "  Elixir\n  Phoenix") in
+  local options="\
+    Elixir\n
+    Phoenix
+  "
+
+  case $(menu "Remove" "$options") in
   *Elixir*) present_terminal "leenium-remove-dev-env elixir" ;;
   *Phoenix*) present_terminal "leenium-remove-dev-env phoenix" ;;
   *) show_remove_development_menu ;;
@@ -735,7 +1093,14 @@ show_remove_elixir_menu() {
 }
 
 show_update_menu() {
-  case $(menu "Update" "  Leenium\n󱋡  History\n󰸌  Extra Themes\n  Firmware") in
+  local options="\
+    Leenium\n
+  󱋡  History\n
+  󰸌  Extra Themes\n
+    Firmware
+  "
+
+  case $(menu "Update" "$options") in
   *Leenium*) present_terminal leenium-update ;;
   *History*) present_terminal leenium-update-history ;;
   *Themes*) present_terminal leenium-theme-update ;;
@@ -745,7 +1110,16 @@ show_update_menu() {
 }
 
 show_maintenance_menu() {
-  case $(menu "Maintenance" "  Refresh Config\n  Restart Services\n󰇅  Restart Hardware\n  Password\n  Timezone\n  Time") in
+  local options="\
+    Refresh Config\n
+    Restart Services\n
+  󰇅  Restart Hardware\n
+    Password\n
+    Timezone\n
+    Time
+  "
+
+  case $(menu "Maintenance" "$options") in
   *Config*) show_maintenance_config_menu ;;
   *Services*) show_maintenance_process_menu ;;
   *Hardware*) show_maintenance_hardware_menu ;;
@@ -757,7 +1131,16 @@ show_maintenance_menu() {
 }
 
 show_maintenance_process_menu() {
-  case $(menu "Restart Services" "  Hypridle\n  Hyprsunset\n󰎟  Mako\n  Swayosd\n󰌧  Walker\n󰍜  Waybar") in
+  local options="\
+    Hypridle\n
+    Hyprsunset\n
+  󰎟  Mako\n
+    Swayosd\n
+  󰌧  Walker\n
+  󰍜  Waybar
+  "
+
+  case $(menu "Restart Services" "$options") in
   *Hypridle*) leenium-restart-hypridle ;;
   *Hyprsunset*) leenium-restart-hyprsunset ;;
   *Mako*) leenium-restart-mako ;;
@@ -769,7 +1152,19 @@ show_maintenance_process_menu() {
 }
 
 show_maintenance_config_menu() {
-  case $(menu "Refresh Config" "  Hyprland\n  Hypridle\n  Hyprlock\n  Hyprsunset\n󱣴  Plymouth\n  Swayosd\n  Tmux\n󰌧  Walker\n󰍜  Waybar") in
+  local options="\
+    Hyprland\n
+    Hypridle\n
+    Hyprlock\n
+    Hyprsunset\n
+  󱣴  Plymouth\n
+    Swayosd\n
+    Tmux\n
+  󰌧  Walker\n
+  󰍜  Waybar
+  "
+
+  case $(menu "Refresh Config" "$options") in
   *Hyprland*) present_terminal leenium-refresh-hyprland ;;
   *Hypridle*) present_terminal leenium-refresh-hypridle ;;
   *Hyprlock*) present_terminal leenium-refresh-hyprlock ;;
@@ -784,7 +1179,14 @@ show_maintenance_config_menu() {
 }
 
 show_maintenance_hardware_menu() {
-  case $(menu "Restart" "  Audio\n󱚾  Wi-Fi\n󰂯  Bluetooth\n󰟸  Trackpad") in
+  local options="\
+    Audio\n
+  󱚾  Wi-Fi\n
+  󰂯  Bluetooth\n
+  󰟸  Trackpad
+  "
+
+  case $(menu "Restart" "$options") in
   *Audio*) present_terminal leenium-restart-pipewire ;;
   *Wi-Fi*) present_terminal leenium-restart-wifi ;;
   *Bluetooth*) present_terminal leenium-restart-bluetooth ;;
@@ -794,7 +1196,12 @@ show_maintenance_hardware_menu() {
 }
 
 show_maintenance_password_menu() {
-  case $(menu "Change Password" "  Drive Encryption\n  User") in
+  local options="\
+    Drive Encryption\n
+    User
+  "
+
+  case $(menu "Change Password" "$options") in
   *Drive*) present_terminal leenium-drive-set-password ;;
   *User*) present_terminal passwd ;;
   *) show_maintenance_menu ;;
