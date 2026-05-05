@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# leenium:summary=Install Xbox Cloud Gaming as a web app and launch it.
+
+set -e
+
+echo "Installing Xbox Cloud Gaming..."
+leenium-webapp-install "Xbox Cloud Gaming" "https://www.xbox.com/en-US/play" "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/xbox.png"
+
+setsid leenium-launch-webapp "https://www.xbox.com/en-US/play" >/dev/null 2>&1 &

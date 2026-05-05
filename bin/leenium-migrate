@@ -40,7 +40,7 @@ for file in "${files[@]}"; do
   migration_version=$(sed -n 's/^MIGRATION_VERSION="\([^"]*\)"$/\1/p' "$file" | head -n1)
 
   if [[ ! -f $STATE_DIR/$filename && ! -f $STATE_DIR/skipped/$filename ]]; then
-    if [[ -n $migration_version ]] && (! version_lt "$previous_version" "$migration_version" || ! version_le "$migration_version" "$current_version"); then
+    if [[ -n $migration_version ]] && (! version_le "$previous_version" "$migration_version" || ! version_le "$migration_version" "$current_version"); then
       continue
     fi
 
