@@ -224,10 +224,10 @@ show_action_menu() {
 
 show_capture_menu() {
   local options="\
-    Screenshot
-    Screenrecord
-  󰴑  Text Extraction
-  󰃉  Color
+      Screenshot
+      Screenrecord
+    󰴑  Text Extraction
+    󰃉  Color
   "
 
   case $(menu "Capture" "$options") in
