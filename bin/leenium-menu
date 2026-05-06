@@ -138,8 +138,19 @@ aur_install_and_launch() {
 # ── Main Menu & Router ────────────────────────────────────
 
 show_main_menu() {
-  # go_to_menu "$(menu "Go" "󰀻  Apps\n󰧑  Learn\n󱓞  Trigger\n  Containers\n  Style\n  Settings\n󰘦  Config\n󰏗  Packages\n  Update\n  About\n  System")"
-  go_to_menu "$(menu "Go" "󰀻  Apps\n󰧑  Learn\n󱓞  Actions\n  Appearance\n󱧘  Install\n󱧗  Remove\n  Settings\n  Update\n  About\n  System")"
+  local options="\
+    󰀻  Apps
+    󰧑  Learn
+    󱓞  Actions
+      Appearance
+    󱧘  Install
+    󱧗  Remove
+      Settings
+      Update
+      About
+      System
+  "
+  go_to_menu "$(menu "Go" "$options")"
 }
 
 go_to_menu() {
@@ -564,11 +575,11 @@ show_install_elixir_menu() {
 
 show_install_editor_menu() {
   local options="\
-     VSCode\n
-     Cursor\n
-     Zed\n
-     Helix\n
-     Emacs
+      VSCode
+      Cursor
+      Zed
+      Helix
+      Emacs
   "
   case $(menu "Install" "$options") in
   *VSCode*) present_terminal leenium-install-vscode ;;
@@ -582,9 +593,9 @@ show_install_editor_menu() {
 
 show_install_terminal_menu() {
   local options="\
-     Alacritty\n
-     Ghostty\n
-     Kitty
+      Alacritty
+      Ghostty
+      Kitty
   "
   case $(menu "Install" "$options") in
   *Alacritty*) install_terminal "alacritty" ;;
@@ -602,14 +613,14 @@ show_install_ai_menu() {
   )
 
   local options="\
-  󱚤  Claude Code\n
-  󱚤  Codex\n
-  󱚤  Crush\n
-    Dictation\n
-  󱚤  Gemini CLI\n
-  󱚤  Ollama\n
-  󱚤  OpenCode\n
-  󱚤  LM Studio (AUR)
+    󱚤  Claude Code
+    󱚤  Codex
+    󱚤  Crush
+      Dictation
+    󱚤  Gemini CLI
+    󱚤  Ollama
+    󱚤  OpenCode
+    󱚤  LM Studio (AUR)
   "
 
   case $(menu "Install" "$options") in
@@ -627,15 +638,15 @@ show_install_ai_menu() {
 
 show_install_gaming_menu() {
   local options="\
-    Steam\n
-  󰢹  NVIDIA GeForce NOW\n
-    RetroArch\n
-  󰍳  Minecraft [AUR]\n
-    Xbox Cloud Gaming\n
-  󰖺  Xbox Controller (󰂯)\n
-    Lutris (Battle.net)\n
-  󱓟  Heroic (Epic Games)\n
-  󰍹  Moonlight (GameStream)
+      Steam
+    󰢹  NVIDIA GeForce NOW
+      RetroArch
+    󰍳  Minecraft [AUR]
+      Xbox Cloud Gaming
+    󰖺  Xbox Controller (󰂯)
+      Lutris (Battle.net)
+    󱓟  Heroic (Epic Games)
+    󰍹  Moonlight (GameStream)
   "
 
 case $(menu "Install" "$options") in
@@ -832,14 +843,14 @@ show_remove_terminal_menu() {
 
 show_remove_ai_menu() {
   local options="\
-  󱚤  Claude Code\n
-  󱚤  Codex
-  󱚤  Crush
-    Dictation
-  󱚤  Gemini CLI
-  󱚤  Ollama
-  󱚤  OpenCode
-  󱚤  LM Studio
+    󱚤  Claude Code
+    󱚤  Codex
+    󱚤  Crush
+      Dictation
+    󱚤  Gemini CLI
+    󱚤  Ollama
+    󱚤  OpenCode
+    󱚤  LM Studio
   "
 
   case $(menu "Remove" "$options") in
@@ -937,15 +948,15 @@ show_config_menu() {
 
 show_setup_config_menu() {
   local options="\
-     Defaults\n
-     Hyprland\n
-     Hypridle\n
-     Hyprlock\n
-     Hyprsunset\n
-     Swayosd\n
-   󰌧  Walker\n
-   󰍜  Waybar\n
-   󰞅  XCompose
+      Defaults
+      Hyprland
+      Hypridle
+      Hyprlock
+      Hyprsunset
+      Swayosd
+    󰌧  Walker
+    󰍜  Waybar
+    󰞅  XCompose
   "
   case $(menu "Config" "$options") in
 
@@ -966,18 +977,18 @@ show_setup_config_menu() {
 
 show_toggle_menu() {
   local options="\
-  󱄄  Screensaver\n
-  󰔎  Nightlight\n
-  󱫖  Idle Lock\n
-  󰂛  Notifications\n
-  󰍜  Top Bar\n
-  󱂬  Workspace Layout\n
-    Window Gaps\n
-    1-Window Ratio\n
-  󰍹  Monitor Scaling\n
-    Direct Boot\n
-  󰛧  Laptop Display\n
-  󰟵  Passwordless Sudo
+    󱄄  Screensaver
+    󰔎  Nightlight
+    󱫖  Idle Lock
+    󰂛  Notifications
+    󰍜  Top Bar
+    󱂬  Workspace Layout
+      Window Gaps
+      1-Window Ratio
+    󰍹  Monitor Scaling
+      Direct Boot
+    󰛧  Laptop Display
+    󰟵  Passwordless Sudo
   "
 
   if [[ -n "$(leenium-hw-touchpad)" ]]; then
@@ -1054,11 +1065,11 @@ show_maintenance_config_menu() {
 
 show_maintenance_process_menu() {
   local options="\
-    Hypridle\n
-    Hyprsunset\n
-  󰎟  Mako\n
-    Swayosd\n
-  󰌧  Walker\n
+    Hypridle
+    Hyprsunset
+  󰎟  Mako
+    Swayosd
+  󰌧  Walker
   󰍜  Waybar
   "
 
@@ -1107,10 +1118,14 @@ show_connectivity_menu() {
   local options=""
 
   if command -v tailscale >/dev/null 2>&1; then
-    options="󰊠  Tailscale\n"
+    options="󰊠  Tailscale"
   fi
 
-  options="${options}  Wi-Fi\n󰂯  Bluetooth"
+  options="\
+    ${options}
+      Wi-Fi
+    󰂯  Bluetooth
+  "
 
   case $(menu "Connectivity" "$options") in
   "$MENU_BACK") show_settings_menu ;;
@@ -1124,10 +1139,10 @@ show_connectivity_menu() {
 
 show_network_tailscale_menu() {
   local options="\
-  󰐊  Up\n
-  󰓛  Down\n
-  󰋼  Status\n
-  󰞁  Nodes
+    󰐊  Up
+    󰓛  Down
+    󰋼  Status
+    󰞁  Nodes
   "
 
   case $(menu "Tailscale" "$options") in
@@ -1207,8 +1222,8 @@ show_hardware_menu() {
 
 show_setup_security_menu() {
   local options="\
-   󰈷  Fingerprint\n
-     Fido2
+    󰈷  Fingerprint
+      Fido2
   "
   case $(menu "Security" "$options") in
 
@@ -1225,10 +1240,10 @@ show_setup_security_menu() {
 
 show_update_menu() {
   local options="\
-    Leenium\n
-  󱋡  History\n
-  󰸌  Extra Themes\n
-    Firmware
+      Leenium
+    󱋡  History
+    󰸌  Extra Themes
+      Firmware
   "
 
   case $(menu "Update" "$options") in
