@@ -130,11 +130,11 @@ aur_install_and_launch() {
 
 show_learn_menu() {
   local options="\
-    Keybindings\n
-    Leenium\n
-    Hyprland\n
-  󰣇  Arch\n
-    Neovim\n
+    Keybindings
+    Leenium
+    Hyprland
+  󰣇  Arch
+    Neovim
   󱆃  Bash
   "
 
@@ -153,7 +153,7 @@ show_learn_menu() {
 
 show_action_menu() {
   local options="\
-    Capture\n
+    Capture
     Share
   "
 
@@ -168,9 +168,9 @@ show_action_menu() {
 
 show_network_tailscale_menu() {
   local options="\
-  󰐊  Up\n
-  󰓛  Down\n
-  󰋼  Status\n
+  󰐊  Up
+  󰓛  Down
+  󰋼  Status
   󰞁  Nodes
   "
 
@@ -189,10 +189,14 @@ show_connectivity_menu() {
   local options=""
 
   if command -v tailscale >/dev/null 2>&1; then
-    options="󰊠  Tailscale\n"
+    options="󰊠  Tailscale"
   fi
 
-  options="${options}  Wi-Fi\n󰂯  Bluetooth"
+  options="\
+    ${options}
+        Wi-Fi
+    󰂯  Bluetooth
+  "
 
   case $(menu "Connectivity" "$options") in
   "$MENU_BACK") show_settings_menu ;;
@@ -206,9 +210,9 @@ show_connectivity_menu() {
 
 show_capture_menu() {
   local options="\
-    Screenshot\n
-    Screenrecord\n
-  󰴑  Text Extraction\n
+    Screenshot
+    Screenrecord
+  󰴑  Text Extraction
   󰃉  Color
   "
 
@@ -261,9 +265,9 @@ show_screenrecord_menu() {
   leenium-capture-screenrecording --stop-recording && exit 0
 
   local options="\
-    With no audio\n
-    With desktop audio\n
-    With desktop + microphone audio\n
+    With no audio
+    With desktop audio
+    With desktop + microphone audio
     With desktop + microphone audio + webcam
   "
 
@@ -287,8 +291,8 @@ show_screenrecord_menu() {
 
 show_share_menu() {
   local options="\
-    Clipboard\n
-    File \n
+    Clipboard
+    File 
     Folder
   "
 
@@ -304,17 +308,17 @@ show_share_menu() {
 
 show_toggle_menu() {
   local options="\
-  󱄄  Screensaver\n
-  󰔎  Nightlight\n
-  󱫖  Idle Lock\n
-  󰂛  Notifications\n
-  󰍜  Top Bar\n
-  󱂬  Workspace Layout\n
-    Window Gaps\n
-    1-Window Ratio\n
-  󰍹  Monitor Scaling\n
-    Direct Boot\n
-  󰛧  Laptop Display\n
+  󱄄  Screensaver
+  󰔎  Nightlight
+  󱫖  Idle Lock
+  󰂛  Notifications
+  󰍜  Top Bar
+  󱂬  Workspace Layout
+    Window Gaps
+    1-Window Ratio
+  󰍹  Monitor Scaling
+    Direct Boot
+  󰛧  Laptop Display
   󰟵  Passwordless Sudo
   "
 
@@ -373,12 +377,12 @@ show_hardware_menu() {
 
 show_appearance_menu() {
   local options="\
-  󰸌  Theme\n
-  󰟵  Unlock\n
-    Font\n
-    Background\n
-    Hyprland\n
-  󱄄  Screensaver\n
+  󰸌  Theme
+  󰟵  Unlock
+    Font
+    Background
+    Hyprland
+  󱄄  Screensaver
     About
   "
 
@@ -399,9 +403,9 @@ show_appearance_menu() {
 
 show_screensaver_menu() {
   local options="\
-    Set From Image\n
-    Restore Default\n
-    Edit Text\n
+    Set From Image
+    Restore Default
+    Edit Text
   󱄄  Preview
   "
 
@@ -448,16 +452,16 @@ show_font_menu() {
 
 show_settings_menu() {
   local options="\
-   󰘦  Config\n
-   󰔎  Toggle\n
-   󱌣  Maintenance\n
-     Audio\n
-     Connectivity\n
-   󱐋  Power Profile\n
-     System Sleep\n
-   󰍹  Monitors\n
-     Hardware\n
-   󰱔  DNS\n
+   󰘦  Config
+   󰔎  Toggle
+   󱌣  Maintenance
+     Audio
+     Connectivity
+   󱐋  Power Profile
+     System Sleep
+   󰍹  Monitors
+     Hardware
+   󰱔  DNS
      Security
   "
   case $(menu "Settings" "$options") in
@@ -506,7 +510,7 @@ show_setup_power_menu() {
 
 show_setup_security_menu() {
   local options="\
-   󰈷  Fingerprint\n
+   󰈷  Fingerprint
      Fido2
   "
   case $(menu "Security" "$options") in
@@ -521,14 +525,14 @@ show_setup_security_menu() {
 
 show_setup_config_menu() {
   local options="\
-     Defaults\n
-     Hyprland\n
-     Hypridle\n
-     Hyprlock\n
-     Hyprsunset\n
-     Swayosd\n
-   󰌧  Walker\n
-   󰍜  Waybar\n
+     Defaults
+     Hyprland
+     Hypridle
+     Hyprlock
+     Hyprsunset
+     Swayosd
+   󰌧  Walker
+   󰍜  Waybar
    󰞅  XCompose
   "
   case $(menu "Config" "$options") in
@@ -575,17 +579,17 @@ show_setup_system_menu() {
 
 show_install_menu() {
   local options="\
-   󰣇  PACMAN\n
-   󰣇  AUR\n
-     Web App\n
-     TUI\n
-     Service\n
-     Style\n
-   󰵮  Development\n
-     Editor\n
-     Terminal\n
-   󱚤  AI\n
-   󰍲  Windows\n
+   󰣇  PACMAN
+   󰣇  AUR
+     Web App
+     TUI
+     Service
+     Style
+   󰵮  Development
+     Editor
+     Terminal
+   󱚤  AI
+   󰍲  Windows
      Gaming
   "
   case $(menu "Install" "$options") in
@@ -634,12 +638,12 @@ show_install_menu() {
 
 show_install_service_menu() {
   local options="\
-     Tailscale\n
-   󱇱  NordVPN [AUR]\n
-     Telegram\n
-   󰭹  Signal\n
-     Discord\n
-     Chromium Account\n
+     Tailscale
+   󱇱  NordVPN [AUR]
+     Telegram
+   󰭹  Signal
+     Discord
+     Chromium Account
    󰏖  ONCE [AUR]
   "
   case $(menu "Install" "$options") in
@@ -659,10 +663,10 @@ show_install_service_menu() {
 
 show_install_editor_menu() {
   local options="\
-     VSCode\n
-     Cursor\n
-     Zed\n
-     Helix\n
+     VSCode
+     Cursor
+     Zed
+     Helix
      Emacs
   "
   case $(menu "Install" "$options") in
@@ -677,8 +681,8 @@ show_install_editor_menu() {
 
 show_install_terminal_menu() {
   local options="\
-     Alacritty\n
-     Ghostty\n
+     Alacritty
+     Ghostty
      Kitty
   "
   case $(menu "Install" "$options") in
@@ -697,13 +701,13 @@ show_install_ai_menu() {
   )
 
   local options="\
-  󱚤  Claude Code\n
-  󱚤  Codex\n
-  󱚤  Crush\n
-    Dictation\n
-  󱚤  Gemini CLI\n
-  󱚤  Ollama\n
-  󱚤  OpenCode\n
+  󱚤  Claude Code
+  󱚤  Codex
+  󱚤  Crush
+    Dictation
+  󱚤  Gemini CLI
+  󱚤  Ollama
+  󱚤  OpenCode
   󱚤  LM Studio (AUR)
   "
 
@@ -722,14 +726,14 @@ show_install_ai_menu() {
 
 show_install_gaming_menu() {
   local options="\
-    Steam\n
-  󰢹  NVIDIA GeForce NOW\n
-    RetroArch\n
-  󰍳  Minecraft [AUR]\n
-    Xbox Cloud Gaming\n
-  󰖺  Xbox Controller (󰂯)\n
-    Lutris (Battle.net)\n
-  󱓟  Heroic (Epic Games)\n
+    Steam
+  󰢹  NVIDIA GeForce NOW
+    RetroArch
+  󰍳  Minecraft [AUR]
+    Xbox Cloud Gaming
+  󰖺  Xbox Controller (󰂯)
+    Lutris (Battle.net)
+  󱓟  Heroic (Epic Games)
   󰍹  Moonlight (GameStream)
   "
 
@@ -750,8 +754,8 @@ case $(menu "Install" "$options") in
 
 show_install_style_menu() {
   local options="\
-  󰸌  Theme\n
-    Background\n
+  󰸌  Theme
+    Background
     Font
   "
 
@@ -765,11 +769,11 @@ show_install_style_menu() {
 
 show_install_font_menu() {
   local options="\
-    Cascadia Mono\n
-    Meslo LG Mono\n
-    Fira Code\n
-    Victor Code\n
-    Bitstream Vera Mono\n
+    Cascadia Mono
+    Meslo LG Mono
+    Fira Code
+    Victor Code
+    Bitstream Vera Mono
     Iosevka
   "
   case $(menu "Install" "$options" "--width 350") in
@@ -786,19 +790,19 @@ show_install_font_menu() {
 
 show_install_development_menu() {
   local options="\
-    Clojure\n
-    Docker DB\n
-    Elixir\n
-    Go\n
-    Java\n
-    JavaScript\n
-    .NET\n
-    OCaml\n
-    PHP\n
-    Python\n
-  󰫏  Ruby on Rails\n
-    Rust\n
-    Scala\n
+    Clojure
+    Docker DB
+    Elixir
+    Go
+    Java
+    JavaScript
+    .NET
+    OCaml
+    PHP
+    Python
+  󰫏  Ruby on Rails
+    Rust
+    Scala
     Zig
   "
 
@@ -823,8 +827,8 @@ show_install_development_menu() {
 
 show_install_javascript_menu() {
   local options="\
-    Node.js\n
-    Bun\n
+    Node.js
+    Bun
     Deno
   "
 
@@ -838,8 +842,8 @@ show_install_javascript_menu() {
 
 show_install_php_menu() {
   local options="\
-    PHP\n
-    Laravel\n
+    PHP
+    Laravel
     Symfony
   "
 
@@ -853,7 +857,7 @@ show_install_php_menu() {
 
 show_install_elixir_menu() {
   local options="\
-    Elixir\n
+    Elixir
     Phoenix
   "
 
@@ -866,19 +870,19 @@ show_install_elixir_menu() {
 
 show_remove_menu() {
   local options="\
-  󰣇  Packages\n
-    Web App\n
-    TUI\n
-    Service\n
-  󰏓  Preinstalls\n
-  󰸌  Theme\n
-  󰵮  Development\n
-    Gaming\n
-    Editor\n
-    Terminal\n
-  󱚤  AI\n
-  󰍲  Windows\n
-  󰈷  Fingerprint\n
+  󰣇  Packages
+    Web App
+    TUI
+    Service
+  󰏓  Preinstalls
+  󰸌  Theme
+  󰵮  Development
+    Gaming
+    Editor
+    Terminal
+  󱚤  AI
+  󰍲  Windows
+  󰈷  Fingerprint
     Fido2
   "
 
@@ -904,14 +908,14 @@ show_remove_menu() {
 
 show_remove_gaming_menu() {
   local options="\
-    Steam\n
-  󰢹  NVIDIA GeForce NOW\n
-    RetroArch\n
-  󰍳  Minecraft [AUR]\n
-    Xbox Cloud Gaming\n
-  󰖺  Xbox Controller (󰂯)\n
-    Lutris (Battle.net)\n
-  󱓟  Heroic (Epic Games)\n
+    Steam
+  󰢹  NVIDIA GeForce NOW
+    RetroArch
+  󰍳  Minecraft [AUR]
+    Xbox Cloud Gaming
+  󰖺  Xbox Controller (󰂯)
+    Lutris (Battle.net)
+  󱓟  Heroic (Epic Games)
   󰍹  Moonlight (GameStream)
   "
 
@@ -933,12 +937,12 @@ show_remove_gaming_menu() {
 
 show_remove_service_menu() {
   local options="\
-    Tailscale\n
-  󱇱  NordVPN [AUR]\n
-    Telegram\n
-  󰭹  Signal\n
-    Discord\n
-    Chromium Account\n
+    Tailscale
+  󱇱  NordVPN [AUR]
+    Telegram
+  󰭹  Signal
+    Discord
+    Chromium Account
   󰏖  ONCE [AUR]
   "
 
@@ -957,10 +961,10 @@ show_remove_service_menu() {
 
 show_remove_editor_menu() {
   local options="\
-    VSCode\n
-    Cursor\n
-    Zed\n
-    Helix\n
+    VSCode
+    Cursor
+    Zed
+    Helix
     Emacs
   "
 
@@ -976,8 +980,8 @@ show_remove_editor_menu() {
 
 show_remove_terminal_menu() {
   local options="\
-    Alacritty\n
-    Ghostty\n
+    Alacritty
+    Ghostty
     Kitty
   "
 
@@ -991,13 +995,13 @@ show_remove_terminal_menu() {
 
 show_remove_ai_menu() {
   local options="\
-  󱚤  Claude Code\n
-  󱚤  Codex\n
-  󱚤  Crush\n
-    Dictation\n
-  󱚤  Gemini CLI\n
-  󱚤  Ollama\n
-  󱚤  OpenCode\n
+  󱚤  Claude Code
+  󱚤  Codex
+  󱚤  Crush
+    Dictation
+  󱚤  Gemini CLI
+  󱚤  Ollama
+  󱚤  OpenCode
   󱚤  LM Studio
   "
 
@@ -1016,18 +1020,18 @@ show_remove_ai_menu() {
 
 show_remove_development_menu() {
   local options="\
-    Clojure\n
-    Elixir\n
-    Go\n
-    Java\n
-    JavaScript\n
-    .NET\n
-    OCaml\n
-    PHP\n
-    Python\n
-  󰫏  Ruby on Rails\n
-    Rust\n
-    Scala\n
+    Clojure
+    Elixir
+    Go
+    Java
+    JavaScript
+    .NET
+    OCaml
+    PHP
+    Python
+  󰫏  Ruby on Rails
+    Rust
+    Scala
     Zig
   "
 
@@ -1051,8 +1055,8 @@ show_remove_development_menu() {
 
 show_remove_javascript_menu() {
   local options="\
-    Node.js\n
-    Bun\n
+    Node.js
+    Bun
     Deno
   "
 
@@ -1066,8 +1070,8 @@ show_remove_javascript_menu() {
 
 show_remove_php_menu() {
   local options="\
-    PHP\n
-    Laravel\n
+    PHP
+    Laravel
     Symfony
   "
 
@@ -1081,7 +1085,7 @@ show_remove_php_menu() {
 
 show_remove_elixir_menu() {
   local options="\
-    Elixir\n
+    Elixir
     Phoenix
   "
 
@@ -1094,9 +1098,9 @@ show_remove_elixir_menu() {
 
 show_update_menu() {
   local options="\
-    Leenium\n
-  󱋡  History\n
-  󰸌  Extra Themes\n
+    Leenium
+  󱋡  History
+  󰸌  Extra Themes
     Firmware
   "
 
@@ -1111,11 +1115,11 @@ show_update_menu() {
 
 show_maintenance_menu() {
   local options="\
-    Refresh Config\n
-    Restart Services\n
-  󰇅  Restart Hardware\n
-    Password\n
-    Timezone\n
+    Refresh Config
+    Restart Services
+  󰇅  Restart Hardware
+    Password
+    Timezone
     Time
   "
 
@@ -1132,11 +1136,11 @@ show_maintenance_menu() {
 
 show_maintenance_process_menu() {
   local options="\
-    Hypridle\n
-    Hyprsunset\n
-  󰎟  Mako\n
-    Swayosd\n
-  󰌧  Walker\n
+    Hypridle
+    Hyprsunset
+  󰎟  Mako
+    Swayosd
+  󰌧  Walker
   󰍜  Waybar
   "
 
@@ -1153,14 +1157,14 @@ show_maintenance_process_menu() {
 
 show_maintenance_config_menu() {
   local options="\
-    Hyprland\n
-    Hypridle\n
-    Hyprlock\n
-    Hyprsunset\n
-  󱣴  Plymouth\n
-    Swayosd\n
-    Tmux\n
-  󰌧  Walker\n
+    Hyprland
+    Hypridle
+    Hyprlock
+    Hyprsunset
+  󱣴  Plymouth
+    Swayosd
+    Tmux
+  󰌧  Walker
   󰍜  Waybar
   "
 
@@ -1180,9 +1184,9 @@ show_maintenance_config_menu() {
 
 show_maintenance_hardware_menu() {
   local options="\
-    Audio\n
-  󱚾  Wi-Fi\n
-  󰂯  Bluetooth\n
+    Audio
+  󱚾  Wi-Fi
+  󰂯  Bluetooth
   󰟸  Trackpad
   "
 
@@ -1197,7 +1201,7 @@ show_maintenance_hardware_menu() {
 
 show_maintenance_password_menu() {
   local options="\
-    Drive Encryption\n
+    Drive Encryption
     User
   "
 
@@ -1213,10 +1217,19 @@ show_about() {
 }
 
 show_system_menu() {
-  local options="󱄄  Screensaver\n  Lock"
+  local options="\
+      󱄄  Screensaver
+          Lock
+  "
+
   ! leenium-toggle-enabled suspend-off && options="$options\n󰒲  Suspend"
   leenium-hibernation-available && options="$options\n󰤁  Hibernate"
-  options="$options\n󰍃  Logout\n󰜉  Restart\n󰐥  Shutdown"
+  options="\
+    $options
+      󰍃  Logout
+      󰜉  Restart
+      󰐥  Shutdown
+  "
 
   case $(menu "System" "$options") in
   *Screensaver*) leenium-launch-screensaver force ;;
@@ -1231,8 +1244,19 @@ show_system_menu() {
 }
 
 show_main_menu() {
-  # go_to_menu "$(menu "Go" "󰀻  Apps\n󰧑  Learn\n󱓞  Trigger\n  Containers\n  Style\n  Settings\n󰘦  Config\n󰏗  Packages\n  Update\n  About\n  System")"
-  go_to_menu "$(menu "Go" "󰀻  Apps\n󰧑  Learn\n󱓞  Actions\n  Appearance\n󱧘  Install\n󱧗  Remove\n  Settings\n  Update\n  About\n  System")"
+  local options="\
+    󰀻  Apps
+    󰧑  Learn
+    󱓞  Actions
+        Appearance
+    󱧘  Install
+    󱧗  Remove
+        Settings
+        Update
+        About
+        System
+  "
+  go_to_menu "$(menu "Go" "$options")"
 }
 
 go_to_menu() {
