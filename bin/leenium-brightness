@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# leenium-brightness up|down|up-precise|down-precise|max|min
+set -euo pipefail
+
+case "${1:-}" in
+  up)           brightnessctl -q -e4 -n2 set 5%+ ;;
+  down)         brightnessctl -q -e4 -n2 set 5%- ;;
+  up-precise)   brightnessctl -q -e4 -n2 set 1%+ ;;
+  down-precise) brightnessctl -q -e4 -n2 set 1%- ;;
+  max)          brightnessctl -q -e4 -n2 set 100% ;;
+  min)          brightnessctl -q -e4 -n2 set 1% ;;
+  *)
+    echo "usage: leenium-brightness up|down|up-precise|down-precise|max|min" >&2
+    exit 1
+    ;;
+esac

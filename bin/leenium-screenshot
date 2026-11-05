@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# leenium-screenshot region|screen|file|annotate
+set -euo pipefail
+
+mode="${1:-region}"
+dir="${LEENIUM_SCREENSHOT_DIR:-${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots}"
+file="$dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+
+copy_to_clipboard() {
+  wl-copy --type image/png
+  notify-send -a Leenium "Screenshot" "$1"
+}
+
+case "$mode" in
+  region)
+    geom="$(slurp)" || exit 0                          # Esc = cancel
+    grim -g "$geom" - | copy_to_clipboard "Region copied to clipboard"
+    ;;
+  screen)
+    grim - | copy_to_clipboard "Screen copied to clipboard"
+    ;;
+  file)
+    mkdir -p "$dir"
+    grim "$file"
+    notify-send -a Leenium "Screenshot" "Saved to $file"
+    ;;
+  annotate)
+    geom="$(slurp)" || exit 0
+    mkdir -p "$dir"
+    grim -g "$geom" - | satty --filename - --output-filename "$file" --copy-command wl-copy
+    [[ -f "$file" ]] && notify-send -a Leenium "Screenshot" "Saved to $file"
+    ;;
+  *)
+    echo "usage: leenium-screenshot region|screen|file|annotate" >&2
+    exit 1
+    ;;
+esac

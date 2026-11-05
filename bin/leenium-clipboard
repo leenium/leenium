@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Browse clipboard history, or clear it: leenium-clipboard [clear]
+set -euo pipefail
+
+command -v cliphist >/dev/null || { notify-send "Clipboard" "cliphist is not installed"; exit 1; }
+command -v wl-paste >/dev/null || { notify-send "Clipboard" "wl-clipboard is not installed"; exit 1; }
+
+clear_history() {
+  cliphist wipe
+  wl-copy --clear
+  notify-send -a Leenium "Clipboard" "History cleared"
+}
+
+if [[ "${1:-}" == "clear" ]]; then
+  clear_history
+  exit 0
+fi
+
+# The autostart module owns the two cliphist watchers; do not start a second
+# generic watcher here or entries would be stored twice.
+choice=$( { printf '%s\n' "Clear clipboard history"; cliphist list; } \
+  | fuzzel --dmenu --prompt='Clipboard  ' --lines=20 --width=70 ) || exit 0
+[[ -n "$choice" ]] || exit 0
+
+if [[ "$choice" == "Clear clipboard history" ]]; then
+  clear_history
+  exit 0
+fi
+
+printf '%s' "$choice" | cliphist decode | wl-copy

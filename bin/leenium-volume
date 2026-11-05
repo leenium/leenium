@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# leenium-volume up|down|up-precise|down-precise|mute|mic|output
+set -euo pipefail
+
+sink="@DEFAULT_AUDIO_SINK@"
+mic="@DEFAULT_AUDIO_SOURCE@"
+
+switch_output() {
+  local current next index
+  local -a sinks
+
+  mapfile -t sinks < <(pactl list short sinks | awk '{print $2}')
+  ((${#sinks[@]})) || { notify-send "Audio" "No audio outputs found"; exit 0; }
+
+  current=$(pactl get-default-sink 2>/dev/null || true)
+  next=${sinks[0]}
+
+  for index in "${!sinks[@]}"; do
+    if [[ "${sinks[$index]}" == "$current" ]]; then
+      next=${sinks[$(((index + 1) % ${#sinks[@]}))]}
+      break
+    fi
+  done
+
+  pactl set-default-sink "$next"
+  notify-send "Audio output" "$next"
+}
+
+case "${1:-}" in
+  up)           wpctl set-volume -l 1.0 "$sink" 5%+ ;;
+  down)         wpctl set-volume "$sink" 5%- ;;
+  up-precise)   wpctl set-volume -l 1.0 "$sink" 1%+ ;;
+  down-precise) wpctl set-volume "$sink" 1%- ;;
+  mute)         wpctl set-mute "$sink" toggle ;;
+  mic)          wpctl set-mute "$mic" toggle ;;
+  output)       switch_output ;;
+  *)
+    echo "usage: leenium-volume up|down|up-precise|down-precise|mute|mic|output" >&2
+    exit 1
+    ;;
+esac
