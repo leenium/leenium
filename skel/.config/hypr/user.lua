@@ -1,0 +1,7 @@
+-- Your personal Hyprland settings. Loaded LAST, so anything here wins.
+-- leenium-update never touches this file. Examples:
+--
+-- hl.monitor({ output = "DP-2", mode = "preferred", position = "0x0", scale = 1.6 })
+-- hl.config({ input = { kb_layout = "us,de" } })
+-- bind_exec("SUPER + B", "firefox", "Firefox")
+-- bind_script("SUPER + SHIFT + B", "leenium-launch-browser", nil, "Browser")

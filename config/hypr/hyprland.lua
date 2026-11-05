@@ -1,0 +1,100 @@
+-- Leenium Hyprland entry point.
+
+-- Directory of THIS file (works no matter where Hyprland was started from).
+local config_dir = debug.getinfo(1, "S").source:sub(2):match("(.*/)")
+local home = os.getenv("HOME")
+
+-- Root of the Leenium payload (e.g. /usr/share/leenium), derived from where
+-- this file lives. Helper scripts are shipped in <root>/bin.
+local leenium_root = config_dir:gsub("config/hypr/$", ""):gsub("/$", "")
+if leenium_root == "" then
+  leenium_root = (config_dir:sub(1, 1) == "/") and "/usr/share/leenium" or "."
+end
+
+-- ── Keybinding helpers (global on purpose) ─────────────────────────────────
+-- Every binding module uses one of these four helpers, so a binding reads the
+-- same way everywhere:
+--
+--   bind_dsp(keys, hl.dsp.action(...), description, options)  Hyprland action
+--   bind_exec(keys, "command --args", description, options)   shell command
+--   bind_script(keys, "leenium-script", "args", description, options)
+--   bind_fn(keys, function() ... end, description, options)   Lua callback
+--
+-- options: { repeating = true, locked = true, mouse = true, ... }
+
+local function bind_options(description, options)
+  local opts = {}                                   -- copy, never mutate the caller's table
+  for key, value in pairs(options or {}) do opts[key] = value end
+  opts.description = description
+  return opts
+end
+
+function bind_dsp(keys, dispatcher, description, options)
+  local opts = bind_options(description, options)
+  -- Mouse drag/resize must be handed to hl.bind as a dispatcher; keyboard
+  -- actions go through hl.dispatch so they run at key-press time.
+  if opts.mouse then
+    hl.bind(keys, dispatcher, opts)
+  else
+    hl.bind(keys, function() hl.dispatch(dispatcher) end, opts)
+  end
+end
+
+function bind_exec(keys, command, description, options)
+  hl.bind(keys, hl.dsp.exec_cmd(command), bind_options(description, options))
+end
+
+function bind_fn(keys, action, description, options)
+  hl.bind(keys, action, bind_options(description, options))
+end
+
+-- Absolute path of a Leenium helper script.
+function leenium_bin(name)
+  return leenium_root .. "/bin/" .. name
+end
+
+-- Quoted helper-script command, optionally with raw shell arguments.
+function leenium_cmd(name, args)
+  local command = string.format("%q", leenium_bin(name))
+  if args and args ~= "" then command = command .. " " .. args end
+  return command
+end
+
+-- Run a Leenium helper script from <root>/bin.
+function bind_script(keys, name, args, description, options)
+  bind_exec(keys, leenium_cmd(name, args), description, options)
+end
+
+-- ── Module loader ───────────────────────────────────────────────────────────
+local function exists(path)
+  local f = io.open(path, "r")
+  if f then f:close() return true end
+  return false
+end
+
+local function load(path)
+  if not exists(path) then return end
+  local ok, err = pcall(dofile, path)
+  if not ok then
+    -- Keep the session alive and tell the user what broke.
+    io.stderr:write("Hyprland config error in " .. path .. ": " .. tostring(err) .. "\n")
+    os.execute(string.format("notify-send -u critical 'Hyprland config error' %q &", tostring(err)))
+  end
+end
+
+-- Every *.lua file of a directory, sorted by name
+local function lua_files(dir)
+  local list = {}
+  local p = io.popen('find "' .. dir .. '" -maxdepth 1 -name "*.lua" 2>/dev/null | sort')
+  if p then
+    for f in p:lines() do list[#list + 1] = f end
+    p:close()
+  end
+  return list
+end
+
+for _, f in ipairs(lua_files(config_dir .. "modules")) do load(f) end
+for _, f in ipairs(lua_files(config_dir .. "modules/bindings")) do load(f) end
+
+-- Personal overrides in the user's home: never overwritten by leenium-update
+load(home .. "/.config/hypr/user.lua")
