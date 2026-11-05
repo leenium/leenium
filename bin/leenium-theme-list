@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Print available themes, one per line: <id><TAB><display name>
+set -euo pipefail
+LEENIUM_PATH="${LEENIUM_PATH:-/usr/share/leenium}"
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
+for f in "$CFG"/leenium/themes/*.theme "$LEENIUM_PATH"/themes/*.theme; do
+  [[ -f "$f" ]] || continue
+  id="$(basename "$f" .theme)"
+  display="$(grep -m1 '^name=' "$f" | cut -d= -f2-)"
+  printf '%s\t%s\n' "$id" "${display:-$id}"
+done | sort -u -k1,1

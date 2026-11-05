@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# leenium-bg-set <image>   — use your own wallpaper
+# leenium-bg-set --theme   — go back to the theme's generated wallpaper
+set -euo pipefail
+CUR="${XDG_CONFIG_HOME:-$HOME/.config}/leenium/current"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/leenium"
+arg="${1:?usage: leenium-bg-set <image> | --theme}"
+
+if [[ "$arg" == --theme ]]; then
+  rm -f "$CUR/background.custom"
+  ln -sfn "$CACHE/backgrounds/$(cat "$CUR/theme.name").png" "$CUR/background"
+else
+  img="$(realpath "$arg")"
+  [[ -f "$img" ]] || { echo "No such file: $arg" >&2; exit 1; }
+  ln -sfn "$img" "$CUR/background.custom"
+  ln -sfn "$img" "$CUR/background"
+fi
+leenium-shell theme reload >/dev/null 2>&1 || true

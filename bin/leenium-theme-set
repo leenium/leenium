@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+# leenium-theme-set <theme>   — apply a Leenium theme to the whole desktop.
+# Themes: ~/.config/leenium/themes/<name>.theme (user) or $LEENIUM_PATH/themes/<name>.theme
+set -euo pipefail
+LEENIUM_PATH="${LEENIUM_PATH:-/usr/share/leenium}"
+CFG="${XDG_CONFIG_HOME:-$HOME/.config}"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/leenium"
+CUR="$CFG/leenium/current"
+OUT="$CUR/theme"
+
+name="${1:-}"
+if [[ -z "$name" ]]; then
+  echo "usage: leenium-theme-set <theme>"; echo; leenium-theme-list; exit 1
+fi
+file="$CFG/leenium/themes/$name.theme"
+[[ -f "$file" ]] || file="$LEENIUM_PATH/themes/$name.theme"
+[[ -f "$file" ]] || { echo "Unknown theme: $name" >&2; exit 1; }
+
+# ── Parse key=value safely (never `source` a theme file) ─────────────────────
+declare -A t=()
+while IFS='=' read -r key value; do
+  [[ "$key" =~ ^[a-z_]+$ ]] || continue
+  t[$key]="$value"
+done < "$file"
+for k in mode bg bg_alt selection fg fg_dim accent black red green yellow blue magenta cyan white bright_black bright_white; do
+  [[ -n "${t[$k]:-}" ]] || { echo "Theme $name is missing '$k'" >&2; exit 1; }
+done
+
+mkdir -p "$OUT" "$CACHE/backgrounds" "$CFG/btop/themes"
+
+# ── Leenium Shell ───────────────────────────────────────────────────────────
+cat > "$OUT/shell.json" <<EOF
+{
+  "mode": "${t[mode]}",
+  "bg": "#${t[bg]}", "bgAlt": "#${t[bg_alt]}", "selection": "#${t[selection]}",
+  "fg": "#${t[fg]}", "fgDim": "#${t[fg_dim]}",
+  "accent": "#${t[accent]}",
+  "urgent": "#${t[red]}", "ok": "#${t[green]}", "warn": "#${t[yellow]}"
+}
+EOF
+
+# ── Hyprland borders ────────────────────────────────────────────────────────
+cat > "$OUT/hyprland.lua" <<EOF
+hl.config({
+  general = {
+    col = {
+      active_border = "rgb(${t[accent]})",
+      inactive_border = "rgb(${t[selection]})",
+    },
+  },
+})
+EOF
+
+# ── Ghostty ─────────────────────────────────────────────────────────────────
+cat > "$OUT/ghostty.conf" <<EOF
+background = #${t[bg]}
+foreground = #${t[fg]}
+cursor-color = #${t[accent]}
+selection-background = #${t[selection]}
+selection-foreground = #${t[fg]}
+palette = 0=#${t[black]}
+palette = 1=#${t[red]}
+palette = 2=#${t[green]}
+palette = 3=#${t[yellow]}
+palette = 4=#${t[blue]}
+palette = 5=#${t[magenta]}
+palette = 6=#${t[cyan]}
+palette = 7=#${t[white]}
+palette = 8=#${t[bright_black]}
+palette = 9=#${t[red]}
+palette = 10=#${t[green]}
+palette = 11=#${t[yellow]}
+palette = 12=#${t[blue]}
+palette = 13=#${t[magenta]}
+palette = 14=#${t[cyan]}
+palette = 15=#${t[bright_white]}
+EOF
+
+# ── GTK3 (adw-gtk3) and GTK4 (libadwaita) named colors ─────────────────────
+cat > "$OUT/gtk.css" <<EOF
+@define-color accent_color #${t[accent]};
+@define-color accent_bg_color #${t[accent]};
+@define-color accent_fg_color #${t[bg]};
+@define-color window_bg_color #${t[bg]};
+@define-color window_fg_color #${t[fg]};
+@define-color view_bg_color #${t[bg]};
+@define-color view_fg_color #${t[fg]};
+@define-color headerbar_bg_color #${t[bg_alt]};
+@define-color headerbar_fg_color #${t[fg]};
+@define-color sidebar_bg_color #${t[bg_alt]};
+@define-color sidebar_fg_color #${t[fg]};
+@define-color popover_bg_color #${t[bg_alt]};
+@define-color popover_fg_color #${t[fg]};
+@define-color card_bg_color #${t[bg_alt]};
+@define-color card_fg_color #${t[fg]};
+EOF
+
+# ── btop ────────────────────────────────────────────────────────────────────
+cat > "$CFG/btop/themes/leenium.theme" <<EOF
+theme[main_bg]="#${t[bg]}"
+theme[main_fg]="#${t[fg]}"
+theme[title]="#${t[fg]}"
+theme[hi_fg]="#${t[accent]}"
+theme[selected_bg]="#${t[selection]}"
+theme[selected_fg]="#${t[fg]}"
+theme[inactive_fg]="#${t[fg_dim]}"
+theme[proc_misc]="#${t[accent]}"
+theme[cpu_box]="#${t[fg_dim]}"
+theme[mem_box]="#${t[fg_dim]}"
+theme[net_box]="#${t[fg_dim]}"
+theme[proc_box]="#${t[fg_dim]}"
+theme[div_line]="#${t[fg_dim]}"
+theme[cpu_start]="#${t[green]}"
+theme[cpu_mid]="#${t[yellow]}"
+theme[cpu_end]="#${t[red]}"
+EOF
+
+# ── Background: generated, never downloaded ────────────────────────────────
+bg="$CACHE/backgrounds/$name.png"
+if [[ ! -f "$bg" ]]; then
+  magick -size 3840x2160 "radial-gradient:#${t[selection]}-#${t[bg]}" "$bg"
+fi
+if [[ ! -L "$CUR/background.custom" ]]; then
+  ln -sfn "$bg" "$CUR/background"
+fi
+
+# ── Light / dark for GTK and portals ────────────────────────────────────────
+if [[ "${t[mode]}" == light ]]; then gtk=adw-gtk3; scheme=prefer-light; else gtk=adw-gtk3-dark; scheme=prefer-dark; fi
+gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface gtk-theme "$gtk" 2>/dev/null || true
+ini="$CFG/gtk-3.0/settings.ini"
+if [[ -f "$ini" ]]; then sed -i "s/^gtk-theme-name=.*/gtk-theme-name=$gtk/" "$ini"; fi
+# GTK reads ~/.config/gtk-*/gtk.css; point it at the generated colors (absolute path required)
+for v in 3.0 4.0; do
+  mkdir -p "$CFG/gtk-$v"
+  printf '@import url("file://%s");\n' "$OUT/gtk.css" > "$CFG/gtk-$v/gtk.css"
+done
+
+echo "$name" > "$CUR/theme.name"
+
+# ── Reload everything that is running ──────────────────────────────────────
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+  hyprctl reload >/dev/null 2>&1 || true
+  leenium-shell theme reload >/dev/null 2>&1 || true
+  notify-send -a Leenium "Theme" "${t[name]:-$name}" 2>/dev/null || true
+fi
+echo "Theme set: ${t[name]:-$name}"
+

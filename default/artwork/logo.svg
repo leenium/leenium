@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="480 145 540 660" role="img" aria-label="Leenium L logo">
+  <defs>
+    <linearGradient id="leenium" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#f9f5ff"/>
+      <stop offset="0.48" stop-color="#d9b2f9"/>
+      <stop offset="1" stop-color="#b66cf1"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#leenium)" d="M 850 181 C 854 178 858 182 856 190 L 756 526 C 750 546 759 562 779 562 L 960 562 C 974 562 981 572 976 586 L 935 691 C 931 704 918 711 899 711 L 746 711 C 671 711 601 733 537 754 C 527 757 522 752 526 742 C 609 566 734 356 844 187 C 846 184 848 182 850 181 Z"/>
+</svg>

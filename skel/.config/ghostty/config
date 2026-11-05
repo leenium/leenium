@@ -1,0 +1,5 @@
+# Leenium: base settings and theme colors are loaded from these files.
+# Put your own settings in ~/.config/ghostty/user.conf (loaded last).
+config-file = /usr/share/leenium/config/ghostty/config
+config-file = ?~/.config/leenium/current/theme/ghostty.conf
+config-file = ?~/.config/ghostty/user.conf
